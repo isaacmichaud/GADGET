@@ -1,6 +1,6 @@
 #' Creates a design criteria based Experiment object
 #'
-#' @param criteria function which evaluates the utility of a proposed design
+#' @param design_criteria function which evaluates the utility of a proposed design
 #' @param design list of design points that data have been collected
 #' @param response list of responses that have been collected
 #' @param posterior_sampler function that returns a sample from the posterior distribution
@@ -31,11 +31,6 @@ create_dc_experiment <- function(design_criteria,
                                  simulation_parms=NULL
 ) {
   
-  ut <- function(batch_design,theta,prior_design,prior_response) {
-    matrix_batch_design <- matrix(batch_design,nrow=batch,byrow=TRUE)
-    return(utility(matrix_batch_design,theta,prior_design,prior_response))
-  }
-  
   if(is.null(simulation)) { #this will tell us if we should call the simulation or
     sim <- NULL
   } else {
@@ -57,7 +52,7 @@ create_dc_experiment <- function(design_criteria,
     lower = lower_bound,
     post_sim = posterior_sampler,
     post_parms = posterior_parms,
-    ut = ut,
+    dc = design_criteria,
     sim  = sim,
     post = list(),
     stage_output = list(),
@@ -70,6 +65,6 @@ create_dc_experiment <- function(design_criteria,
     next_batch = list(),
     num_parms = length(upper_bound)
   )
-  class(experiment) <- "GADGET_UT_EXP"
+  class(experiment) <- "GADGET_DC_EXP"
   return(experiment)
 }
