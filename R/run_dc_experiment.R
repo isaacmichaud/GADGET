@@ -31,7 +31,7 @@ run_dc_experiment <- function(experiment, verbose = FALSE) {
       my_dc <- function(batch_design) {
         design   <- EXP$design
         response <- EXP$response
-        return(dc(batch_design,post_sample,design,response))
+        return(EXP$dc(batch_design,post_sample,design,response))
       }
       
       EXP             <- run_stage(EXP,design_criteria = my_dc);

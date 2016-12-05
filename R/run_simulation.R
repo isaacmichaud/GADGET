@@ -7,6 +7,7 @@
 #' @param experiment GADGET experiment object
 
 run_simulation <- function(experiment) {
+  browser()
   #still need to be able to handle batch runs as well, possibly in parallel
   batch        <- experiment$batch
   batch_design <- experiment$next_batch
