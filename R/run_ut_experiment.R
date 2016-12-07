@@ -32,11 +32,14 @@ run_ut_experiment <- function(experiment, verbose = FALSE) {
         design   <- EXP$design
         response <- EXP$response
         num_pts  <- length(post_sample[,1])
-        total    <- 0
+        #total    <- 0
+        temp     <- rep(0,num_pts)
         for (i in 1:num_pts) {
-          total <- total + EXP$ut(batch_design,post_sample[i,],design,response)
+          temp[i] <- EXP$ut(batch_design,post_sample[i,],design,response)
+          #total   <- total + EXP$ut(batch_design,post_sample[i,],design,response)
         }
-        return(total/num_pts)
+        return(mean(temp,na.rm=TRUE))
+        #return(total/num_pts)
       }
 
       EXP             <- run_stage(EXP,design_criteria = Expected_UT);
