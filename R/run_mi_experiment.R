@@ -40,7 +40,7 @@ run_mi_experiment <- function(experiment, verbose = FALSE) {
             }
             pred_vals    <- cbind(pred_vals,temp_pred)
         }
-       EXP$dc(pred_vals,post_sample)
+       EXP$dc(post_sample,pred_vals)
       }
 
       EXP             <- run_stage(EXP,design_criteria = mi);
