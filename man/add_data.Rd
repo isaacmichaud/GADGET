@@ -14,4 +14,3 @@ add_data(experiment, new_response)
 \description{
 Merges newly collected data with the current stage of the GADGET experiment.
 }
-

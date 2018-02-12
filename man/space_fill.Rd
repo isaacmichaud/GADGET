@@ -14,4 +14,3 @@ Each stage of a GADGET experiment starts by estimate the current design criterio
 surface using a latin hypercude sample (LHS). This function computes the multidimensional
 LHS given the initial design budget and the boundary constraints of the design space.
 }
-

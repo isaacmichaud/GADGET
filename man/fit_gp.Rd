@@ -19,4 +19,3 @@ design criterion over the batch design space. This function updates the Gaussian
 process model which is used by EQI to sequentially find the best batch design
 given the current design and prior distribution.
 }
-

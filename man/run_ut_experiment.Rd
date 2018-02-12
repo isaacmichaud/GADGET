@@ -15,4 +15,3 @@ run_ut_experiment(experiment, verbose = FALSE)
 Sequentially designs and executes an experiment using the expected utility
 criterion supplied by the user.
 }
-

@@ -39,4 +39,3 @@ create_ut_experiment(utility, design, response, posterior_sampler,
 \description{
 Creates a utility based Experiment object
 }
-

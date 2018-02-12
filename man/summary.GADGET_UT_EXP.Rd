@@ -14,4 +14,3 @@
 \description{
 Prints a summary of a utility based GADGET experiment.
 }
-

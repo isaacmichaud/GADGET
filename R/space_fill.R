@@ -7,7 +7,7 @@
 #' @param experiment a GADGET experiment object
 
 space_fill <- function(experiment) {
-  require(lhs) #get Latin Hypercube functions
+  #require(lhs) #get Latin Hypercube functions
   batch  <- experiment$batch
   upper  <- experiment$upper
   lower  <- experiment$lower
@@ -16,7 +16,7 @@ space_fill <- function(experiment) {
   design <- NULL;
 
   for (i in 1:batch) {
-    temp_design = maximinLHS(n,k)
+    temp_design = lhs::maximinLHS(n,k)
     for (j in 1:k) { #shift and scale the space filling design
       temp_design[,j] <- (upper[j]-lower[j])*temp_design[,j] + lower[j]
     }

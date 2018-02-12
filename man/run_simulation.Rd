@@ -14,4 +14,3 @@ A computer experiment will involve an associated compute code that needs to be
 run to collect new data. This function automatically collects new data to allow
 GADGET to continue sequentially designing and running an experiment.
 }
-

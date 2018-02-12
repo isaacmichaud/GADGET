@@ -11,8 +11,8 @@
 #'
 run_stage <- function(experiment,design_criteria) {
 
-  require(DiceOptim) #needed for EQI routine
-  require(utils) #needed for tail function
+  #require(DiceOptim) #needed for EQI routine
+  #require(utils) #needed for tail function
   
   budget_LHS <- experiment$explore_budget[1]
   budget_EQI <- experiment$explore_budget[2]

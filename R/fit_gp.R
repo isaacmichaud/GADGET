@@ -11,7 +11,7 @@
 
 fit_gp <- function(experiment,design,response) {
 
-  require(DiceKriging)
+  #require(DiceKriging)
   options   <- experiment$gp_options
   formula   <- options$formula
   covKernel <- options$kernel

@@ -18,4 +18,3 @@ parsimonious set of points. A Gaussian process is fit to these points and EQI
 is used to sequentially find new points to update the Gaussian process to find
 its minimum. The best batch design is then returned.
 }
-

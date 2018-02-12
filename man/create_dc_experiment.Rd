@@ -39,4 +39,3 @@ create_dc_experiment(design_criteria, design, response, posterior_sampler,
 \description{
 Creates a design criteria based Experiment object
 }
-
