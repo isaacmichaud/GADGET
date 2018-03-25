@@ -13,6 +13,7 @@ run_stage <- function(experiment,design_criteria) {
 
   #require(DiceOptim) #needed for EQI routine
   #require(utils) #needed for tail function
+  print(paste("Running Stage: ", experiment$stage))
   
   budget_LHS <- experiment$explore_budget[1]
   budget_EQI <- experiment$explore_budget[2]
@@ -66,7 +67,7 @@ run_stage <- function(experiment,design_criteria) {
                          max.generations = 100,
                          wait.generations = 10,
                          hard.generation.limit = FALSE,
-                         print.level=1,
+                         print.level=0,
                          nvars = batch*length(upper)
                          #cluster = TRUE
                         )
@@ -79,6 +80,8 @@ run_stage <- function(experiment,design_criteria) {
                    upper = rep(upper,batch),
                    control = EQI_controls
                    )
+    
+    print(paste("EQI Step",i,":",toString(res$par),res$value))
 
     #collecting the information from eqi
     xlhs          <- rbind(xlhs,res$par)
@@ -100,6 +103,8 @@ run_stage <- function(experiment,design_criteria) {
                                           ))
 
   experiment$next_batch <- tail(xlhs,1)
+  print("Next Batch:")
+  print(experiment$next_batch)
   #experiment$next_batch <- matrix(tail(xlhs,1),ncol=num_parms,byrow=TRUE)  #need something here
   return(experiment)
 }
