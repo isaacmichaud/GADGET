@@ -11,7 +11,6 @@
 
 fit_gp <- function(experiment,design,response) {
 
-  #require(DiceKriging)
   options   <- experiment$gp_options
   formula   <- options$formula
   covKernel <- options$kernel
@@ -26,18 +25,18 @@ fit_gp <- function(experiment,design,response) {
 
   # Create kriging model using two different search algorithms and pick the best
 
-  model1 <- km(formula, design, response, covKernel, nugget.estim=nuggetUse,
+  model1 <- DiceKriging::km(formula, design, response, covKernel, nugget.estim=nuggetUse,
                optim.method="BFGS", control=list(trace=FALSE))
 
-  model2 <- km(formula, design, response, covKernel, nugget.estim=nuggetUse,
+  model2 <- DiceKriging::km(formula, design, response, covKernel, nugget.estim=nuggetUse,
                optim.method="gen",control=list(trace=FALSE,pop.size=1000,
                max.generations=100,wait.generations=10,
                hard.generation.limit=FALSE))
 
   #do we really need to have both fitting procedures?
-  mle1 <- logLik.km(model1)
+  mle1 <- DiceKriging::logLik.km(model1)
 
-  mle2 <- logLik.km(model2)
+  mle2 <- DiceKriging::logLik.km(model2)
 
   #in the future this two model thing should be removed
   if (mle2 > mle1) {
