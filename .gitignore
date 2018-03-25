@@ -3,3 +3,4 @@
 .RData
 
 *.history
+inst/doc

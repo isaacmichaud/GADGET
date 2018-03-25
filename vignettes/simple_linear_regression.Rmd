@@ -1,0 +1,309 @@
+---
+title: "Simple Linear Regression"
+author: "Isaac Michaud"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+D-Optimal Experiment Demo
+
+This script creates a GADGET experiment which uses the classic d-optimal
+design criterion to compute a sequential design for a simple linear regression 
+model. No prior is needed for this experiment, but to fit the criterion into GADGET we can pretend their is a prior but don't use it for computing the criterion surface. A dummy function can be used for the posterior sampler which will not require unnecessary computations. This script also demonstrates the computing batch-sequential designs which include four design points per batch.
+
+```{r}
+set.seed(1234)
+library(MCMCpack)
+library(GADGET)
+```
+
+
+Utilities simply take the design points and compute the utility of different subsequent designs. It takes into account the possible Monte Carlo and takes in its values GADGET does not need to handle these technicalities. Unlike in the design criterion experiment where you can supply GADGET with a an integrand which does need to be integrate using Monte Carlo. 
+
+The utility formulation is gives the user the most control over the computational details of how the utility is computed, possibly allowing for computational exploits that speed up the execution.  
+
+## Construct the Experiment ##
+
+This will be the true process we are working with. 
+```{r}
+#true parameter values
+true_beta  <- c(5,2) #f(x) = 2x + 5
+true_sigma <- 20
+```
+
+### Posterior Sampler ###
+
+GADGET is designed to be used for Bayesian experiments, so by default it assumes that you will have a posterior sampler. This could be any method that produces a sample from the posterior. All that it needs to do is produce a sample of the posterior. 
+
+In cases where the design criterion does not depend on the parameter posterior(s), for example in the case of a linear regression problem we are considering here, one does not need to supply a true posterior sample 
+
+```{r}
+#--- Create a posterior sampler for parameter beta ---#
+#d-optimality criterion doesn't need these, so here are some dummy functions
+#that will make GADGET happy. In the future a seperate create_experiment
+#function will be coded so that you don't need to do this hack 
+
+posterior_parms = 1
+
+posterior_sampler   <- function(design,response,parms) {
+  return(matrix(1,1,1))
+}
+
+#--- Create a posterior sampler for parameter beta ---#
+posterior_parms = list(burnin    = 2000,
+                       thin      = 5,
+                       iter      = 30000,
+                       sigma     = true_sigma,
+                       sigma_var = 0.0001
+                       )
+#the sample size for the kNN is dictated by the size of the posterior sample
+
+posterior_sampler   <- function(design,response,parms) {
+  MCMCregress(response ~ design,
+              data.frame(response,design),
+              burnin=parms$burnin,
+              thin=parms$thin,
+              mcmc=parms$iter,
+              sigma.mu=parms$sigma^2,
+              sigma.var=parms$sigma_var)
+}
+```
+
+### Computer Simulation ###
+
+Because GADGET assumes that you will be executing a sequential experiment, it will want some way of collecting additional data into the design after every stage. This is simple to do if there is an `R` function that can simulate new model responses. If it is real data then the data will need to be manually entered after each stage of the design. 
+
+```{r}
+pred_parms = list(sigma=true_sigma) #we are assuming sigma is known
+
+predictive_sampler  <-  function(design_point,beta,parms) {
+  beta[1] + beta[2]*design_point + rnorm(1,0,parms$sigma)
+}
+
+simulation <- function(design_point) {
+  predictive_sampler(design_point,true_beta,pred_parms)
+}
+```
+
+If simulation is set to `NULL` then GADGET will assume wait until you have supplied the required data until running the next stage of optimization. This would be the case when either: (1) data is coming from a physical experiment, (2) data is coming from a simulator that cannot be run locally through `R` or (3) the simulator needs to be precisely run using random seeds for reproduciblity and it cannot be left to chance. 
+
+### Initial Data ###
+
+Depending on the circumstances of the design, you may have data that is already available to you. 
+
+```{r}
+design       <-  matrix(c(24,26),ncol=1) #I don't need to model the
+response     <-  matrix(vapply(design,simulation,rep(0,1)),ncol=1) #I don't know if I am using this quite correctly
+```
+
+
+### Design Utility ###
+
+GADGET's GP optimization attempts to minimize the objective function, so stictly speaking we are going to minimize the negative utility function of the design. Here we define the D-optimality criterion by augmenting the prior design points with the proposed new design points and computing the negative log-determinant of the Fisher Information Matrix.  
+```{r}
+slr_d_optimal <- function(batch_design,theta,prior_design,prior_response) {
+  X <- rbind(prior_design,batch_design)
+  X <- cbind(rep(1,length(X[,1])),X)
+  -log(det(t(X)%*%X))
+}
+```
+
+Note: This utility function could be improved by making it capable of handling empty prior designs. Also there are computation improvements that could be made too. 
+
+### Putting it all Together ###
+
+Having defined all the previous pieces we can now create the GADGET experiment object which will keep track of all the information as the experiment is sequentially designed and run. 
+
+```{r}
+my_experiment <- create_ut_experiment(utility            = slr_d_optimal,
+                                      design             = design,
+                                      response           = response,
+                                      posterior_sampler  = posterior_sampler,
+                                      posterior_parms    = posterior_parms,
+                                      lower_bound        = 0,
+                                      upper_bound        = 50,
+                                      batch              = 4,
+                                      explore_budget     = c(20,5),
+                                      design_budget      = 2,
+                                      simulation = simulation
+                                      )
+```
+
+
+GADGET is designed to be run in batch mode, where a computer simulation is run (possibly multiple times) at the end of each stage to gather new data and proceed to the next stage of experimentation. It can be used for a single static design by using `batch = n` and `design_budget = 1` which will attempt to find a single n-point design.
+
+Here we will utilize two stage of four design points each. `explore_budget` is a vector that describes the number of utility evaluation to perform for the LHS initial and the number of times that EQI will be maximized before 
+
+
+`lower_bound` and `upper_bound` define the limits of your design space. They should be the same length. They also define the number dimension the design points are from. 
+
+## Run the Experiment ##
+
+```{r setup, include = FALSE}
+my_experiment <- run_ut_experiment(my_experiment,verbose = FALSE)
+```
+
+Currently the `verbose` option is overwhelming. There are a lot of moving parts to the Bayesian experimental design and it is completely possible that 
+
+
+## Experiment Results ## 
+
+GADGET produces a reasonable design which is close to be being balanced. Further tweaking may be required and multiple runs of the algorithm to be tried before actually collecting new data. 
+
+Some standard functions are availaibe...
+
+```{r}
+summary(my_experiment)
+```
+
+```{r}
+print("Stage 1 Design Points:")
+print(my_experiment$design[2+(1:4),])
+print("Stage 2 Design Points:")
+print(my_experiment$design[6+(1:4),])
+```
+If interest is in the responses you can get those easily:
+
+```{r}
+print("Stage 1 Responses:")
+print(my_experiment$response[2+(1:4),])
+print("Stage 2 Responses:")
+print(my_experiment$response[6+(1:4),])
+```
+
+GADGET saves all the stages so diagnostic information can be found by digging into the object. In a future release there will be more function to facilitate accessing this information easier. This one shows the output of the design criterion evaluations, EQI values and the estimated nugget effect as each stage of the experiment. These can be used to diagnose convergence issues. 
+
+```{r}
+stage = 1
+print("LHS Exploration Step of Stage 1")
+my_experiment$stage_output[[stage]][[1]]
+print("EQI Exploration Step of Stage 1")
+my_experiment$stage_output[[stage]][[2]]
+```
+
+The posterior samples are also saved for analysis after GADGET has run. The posteriors are saved directly as whatever object type the posterior sampler uses. In this case you can use `coda` to plot and analyze the MCMC chains. 
+
+```{r}
+#Stage 2 Posterior Sample 
+plot(my_experiment$post[[2]])
+```
+
+# Extensions # 
+
+There are a number of extensions which GADGET can accomidate, but it is usefully up to the user to figure out the needed code that will 
+
+## c-Optimal Design ##
+
+Because of the form of the utility function in the previous example we did not need to have a specific posterior sampler. Here we will computer a c-Optimal Design for minimizing the predictive variance at the point $x = 35$. Again, because the model is linear with Gaussian errors this does not need a Bayesian design, we could simply compute the analytic expression for the variance and minimize it. But let's demonstrate a simple example where we do utiltize the posterior samples.    
+
+We will also demonstrate how to use the dc experiment
+
+```{r}
+design_criterion <- function( )
+  
+```
+
+
+```{r}
+demonstrate add_data function
+```
+
+
+## 'Continuous' Designs ##
+
+The above demonstrate of GADGET designs an experiment point by point. This is inefficient for this example because it is known that the optimal design is only two points. Similar to in the paper there 
+
+This can be remeded by changing the design criterion slightly and incorporating an extra design variable into the 
+
+The following code is utilizes at true posterior estimator.
+
+All that the user needs to do is decide on how to evaluate (or round) the continuous design. 
+
+```{r}
+two_pt_slr_d_optimal <- function(batch_design,
+                                 theta,
+                                 prior_design,
+                                 prior_response) {
+  design_size <- 20   #total number of points to use
+  weight1     <- round(batch_design[3]*design_size)
+  weight2     <- design_size - weight1
+  X           <- c(rep(batch_design[1],weight1),
+                       rep(batch_design[2],weight2))
+  X           <- cbind(rep(1,length(X)),X)
+  return(-log(det(t(X)%*%X)))
+}
+```
+
+
+```{r}
+my_experiment <- create_ut_experiment(utility            = two_pt_slr_d_optimal,
+                                      design             = design,
+                                      response           = response,
+                                      posterior_sampler  = posterior_sampler,
+                                      posterior_parms    = posterior_parms,
+                                      lower_bound        = c(0,0,0.5),
+                                      upper_bound        = c(50,50,0.95),
+                                      batch              = 1,
+                                      explore_budget     = c(20,5),
+                                      design_budget      = 1,
+                                      simulation         = NULL 
+                                      )
+```
+
+```{r setup, include = FALSE}
+my_experiment <- run_ut_experiment(my_experiment,verbose = FALSE)
+```
+
+The method is a little hacky, but in a future release it will be built into the actual design. 
+
+```{r}
+my_experiment$next_batch
+```
+
+
+
+## Vignette Info
+
+Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+
+## Styles
+
+The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+
+    output: 
+      rmarkdown::html_vignette:
+        css: mystyles.css
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))
