@@ -4,19 +4,22 @@ Title: Gaussian Process Approximations for Designing Experiments
 Version: 0.11
 Date: 2018-02-12
 Authors@R: c(person("Isaac", "Michaud", email = "ijmichau@ncsu.edu",role = c("aut", "cre")),
-             person("Brian", "Weaver", email = "theguz@lanl.gov",role = c("aut")),
-             person("Brian", "Williams", email = "brianw@lanl.gov",role = c("aut")))
+             person("Brian", "Weaver", role = c("aut")),
+             person("Brian", "Williams", role = c("aut")))
 Description: Computes near-optimal batch-sequential Bayesian experimental designs using a Gaussian processes as a surrogate for expensive and noisy design criteria.
 License: LGPL (>= 3)
 LazyData: TRUE
 RoxygenNote: 6.0.1
-Imports: DiceKriging, DiceOptim, lhs, utils,
-Suggests: MCMCpack,
+Imports: 
+    DiceKriging, 
+    DiceOptim,  
+    lhs, 
+    utils,
+Suggests: 
+    MCMCpack,
     knitr,
     rmarkdown
 NeedsCompilation: no
-Author: Isaac Michaud [aut, cre],
-  Brian Weaver [aut],
-  Brian Williams [aut]
 Maintainer: Isaac Michaud <ijmichau@ncsu.edu>
+BugReports: https://github.com/isaacmichaud/GADGET/issues
 VignetteBuilder: knitr
