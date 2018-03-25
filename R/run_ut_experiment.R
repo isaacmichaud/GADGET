@@ -52,6 +52,7 @@ run_ut_experiment <- function(experiment, verbose = FALSE) {
         print("Please collect data for the following design point(s)")
         print(EXP$next_batch)
         print("Record the new data using the function add_data")
+        return(EXP) #return object for new data
       } else {
         EXP           <- run_simulation(EXP)
       }
