@@ -45,6 +45,9 @@ run_stage <- function(experiment,design_criteria) {
   for (i in 1:budget_LHS) {
     ylhs[i,1] <- dc(xlhs[i,])
   }
+  
+  #print(xlhs)
+  #print(ylhs)
 
 # --- Run through the EQI budget --- #
   for (i in 1:budget_EQI) { #inner loop
