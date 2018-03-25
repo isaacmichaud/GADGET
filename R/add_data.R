@@ -15,7 +15,11 @@ add_data <- function(experiment,new_response = NULL) {
   
   if (is.null(new_response)) {
     print("Please collect data for the following design point(s)")
-    print(experiment$next_batch)
+    
+    for (i in 0:(batch-1)) {
+       print(batch_design[(i*num_parms+1):((i+1)*num_parms)])
+    }
+    #print(experiment$next_batch)
     return(invisible(NULL))
   }
   

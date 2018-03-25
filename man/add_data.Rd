@@ -4,7 +4,7 @@
 \alias{add_data}
 \title{Add Experimental Data}
 \usage{
-add_data(experiment, new_response)
+add_data(experiment, new_response = NULL)
 }
 \arguments{
 \item{experiment}{GADGET experiment object}

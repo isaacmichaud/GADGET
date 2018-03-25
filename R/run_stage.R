@@ -88,7 +88,7 @@ run_stage <- function(experiment,design_criteria) {
 
     #collecting the information from eqi
     xlhs          <- rbind(xlhs,res$par)
-    ylhs          <- rbind(ylhs,dc(res$par))
+    ylhs          <- rbind(ylhs,dc(as.vector(res$par)))
     eqi           <- rbind(eqi,unlist(res$value[1])) #need to check how to get this cleaner
     nugget        <- rbind(nugget,model@covariance@nugget) #could be removed because we are already saving this
     var           <- rbind(var,model@covariance@sd2) #this could be removed because we are already saving this
