@@ -4,5 +4,5 @@
 
 *.history
 inst/doc
-.rbx
-.rbd
+*.rbx
+*.rbd
