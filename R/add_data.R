@@ -6,13 +6,19 @@
 #' @param new_response matrix where each row is the response for the corresponding row of the current batch design computed by GADGET
 #' @export
 
-add_data <- function(experiment,new_response) {
+add_data <- function(experiment,new_response = NULL) {
   batch         <- experiment$batch
   batch_design  <- experiment$next_batch
   num_parms     <- experiment$num_parms
   temp_design   <- NULL
   temp_response <- NULL
-
+  
+  if (is.null(new_response)) {
+    print("Please collect data for the following design point(s)")
+    print(experiment$next_batch)
+    return(invisible(NULL))
+  }
+  
   if (length(new_response[,1]) != batch) {
     stop("new_response is not the same size as the batch size")
   } else {
