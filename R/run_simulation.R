@@ -17,8 +17,9 @@ run_simulation <- function(experiment) {
     experiment$design   <- rbind(experiment$design,design_point)
     experiment$response <- rbind(experiment$response,sim(design_point))
   }
-  experiment$next_batch    <- list()
-  experiment$next_action   <- 1
-  experiment$stage         <- experiment$stage + 1
+  rownames(experiment$design) <- NULL
+  experiment$next_batch       <- list()
+  experiment$next_action      <- 1
+  experiment$stage            <- experiment$stage + 1
   experiment
 }
