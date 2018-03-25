@@ -71,7 +71,7 @@ run_stage <- function(experiment,design_criteria) {
                          #cluster = TRUE
                         )
 
-    res <- max_EQI(model,
+    res <- DiceOptim::max_EQI(model,
                    new.noise.var = tau_sq,
                    beta  = 0.9, #this should be made into an option
                    type  = "UK",
