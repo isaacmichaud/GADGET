@@ -105,7 +105,7 @@ run_stage <- function(experiment,design_criteria) {
                                           Var = var
                                           ))
 
-  experiment$next_batch <- tail(xlhs,1)
+  experiment$next_batch <- utils::tail(xlhs,1)
   print("Next Batch:")
   print(experiment$next_batch)
   #experiment$next_batch <- matrix(tail(xlhs,1),ncol=num_parms,byrow=TRUE)  #need something here

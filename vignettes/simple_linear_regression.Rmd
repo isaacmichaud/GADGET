@@ -4,7 +4,7 @@ author: "Isaac Michaud"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Simple Linear Regression DOE}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 abstract: "This vignette shows how the `GADGET` package can be used to compute optimal experimental designs for simple linear regression problems. D-optimal. These designs can be computed more accurately using existing coordinate exchange algorithms, but are used here to demonstrate the useage of the `GADGET` package."
