@@ -7,7 +7,7 @@ vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-abstract: "This vignette shows how the `GADGET` package can be used to compute optimal experimental designs for simple linear regression problems. D-optimal and c-optimal designs will be computed. These designs can be computed more accurately using existing coordinate exchange algorithms, but are used here just to demonstrate the useage of the `GADGET` package."
+abstract: "This vignette shows how the `GADGET` package can be used to compute optimal experimental designs for simple linear regression problems. D-optimal. These designs can be computed more accurately using existing coordinate exchange algorithms, but are used here to demonstrate the useage of the `GADGET` package."
 ---
 
 ```{r, warning=FALSE, message=FALSE}
@@ -18,17 +18,17 @@ library(GADGET)
 
 # Introduction #
 
-The `GADGET` package is an implimentation of the Bayesian experimental design algorithm proposed by Weaver et al. 2016^[Weaver, Brian P., et al. "Computational enhancements to Bayesian design of experiments using Gaussian processes." Bayesian Analysis 11.1 (2016): 191-213.]. In addition to computing static designs, `GADGET` can compute sequential and batch-sequential designs. `GADGET` produces an optimal design by using Gaussian process (GP) optimization of a stochastic design criterion. Following the Chaloner and Verdinelli 1995^[Chaloner, Kathryn, and Isabella Verdinelli. "Bayesian experimental design: A review." Statistical Science (1995): 273-304.] the expected utility of a design $\eta$ as 
+The `GADGET` package is an implementation of the Bayesian experimental design algorithm proposed by Weaver et al. 2016^[Weaver, Brian P., et al. "Computational enhancements to Bayesian design of experiments using Gaussian processes." Bayesian Analysis 11.1 (2016): 191-213.]. In addition to computing static designs, `GADGET` can compute sequential and batch-sequential designs. `GADGET` produces an optimal design by using Gaussian process (GP) optimization of a stochastic design criterion. Following Chaloner and Verdinelli 1995^[Chaloner, Kathryn, and Isabella Verdinelli. "Bayesian experimental design: A review." Statistical Science (1995): 273-304.], the expected utility of a design $\eta$ is 
 $$\Lambda(\eta) = \int\int \phi(\eta,\theta,y)p(y|\theta,\eta)p(\theta)dyd\theta,$$
 
-where $\phi$ is the utility of collecting observations $y$ corresponding to design $\eta$ for parameters $\theta$. We call $\Lambda$ a design criterion. `GADGET` estimates the optimal design, $\eta^\star$, by solving the optimization problem
+where $\phi$ is the utility of collecting observations $y$ corresponding to design $\eta$ with parameters $\theta$. `GADGET` estimates the optimal design, $\eta^\star$, by solving the optimization problem
 $$\eta^\star = \underset{\eta}{\mathrm{argmin}}~ -\Lambda(\eta).$$ 
-The design $\eta$ is assumed to be a matrix, where each column corresponds to design variable and each row correponds to a single design point. Pseudo-continuous designs can be used by augmenting each design point with a proportion or weight. The user defined design criterion must be adjusted accordingly to properly round the continous design into a discrete design. 
+The design $\eta$ is assumed to be a matrix where each column corresponds to a design variable and each row corresponds to a single design point. Augmenting each design point with a proportion or weight variable allows pseudo-continuous designs to be optimized. The user defined design criterion must be adjusted accordingly to properly round the continuous design into a discrete design. 
 
-`GADGET` provides two ways of specifying the the design criterion for a particular experiment. The first is to code an entire design criterion $\Lambda$ that evaluates a particular design $\eta$. Here we define the D-optimality criterion by computing the negative log-determinant of the Fisher Information Matrix.  
+`GADGET` provides two ways of specifying the the design criterion for a particular experiment. The first is to code an entire design criterion $\Lambda$ that evaluates a particular design $\eta$. Here we define the D-optimal criterion by computing the negative log-determinant of the Fisher Information Matrix. The design criterion accepts a sample from the current parameter posterior. This example does not utilize these posterior samples, but one can code the criterion to compute an expectation over those posterior distributions.  
 
 ```{r}
-#Example - Design Criterion 
+#Example - D-optimal Design Criterion 
 #model: E[y] = beta_0 + x*beta_1
 slr_d_optimal <- function(batch_design,post_sample,prior_design,prior_response) {
   if (is.null(prior_design)) {
@@ -41,7 +41,7 @@ slr_d_optimal <- function(batch_design,post_sample,prior_design,prior_response) 
 }
 ```
 
-The second way that a design criterion is specified is through the definition of a utility function $\phi$. Utility functions take computed the utility of a particular design with respect to a specific value of the parameters $\theta$. `GADGET` uses Monte Carlo integration to compute the expected utility of a design. This corresponds to the algorithm outlined in Weaver et. al. Appendix A. The design criterion formulation gives the user the most control over the computational details of the expected utility is calculated, whereas the utility formulation may be faster to impliment. The choice is up to the user and the particular problem. 
+The second way that a design criterion is specified is through the definition of a utility function $\phi$. A utility function computed the utility of a particular design with respect to a specific value of the parameters $\theta$. `GADGET` uses Monte Carlo integration to compute the expected utility of a design. This corresponds to the algorithm outlined in Weaver et al. 2016 Appendix A. The design criterion formulation gives the user the most control over the computational details of the expected utility, whereas the utility formulation may be faster to implement.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(cache=TRUE)
@@ -49,7 +49,9 @@ knitr::opts_chunk$set(cache=TRUE)
 
 # Construct `GADGET` Experiment #
 
-Before computing an optimal design, all the necessary function need to be defined. We will use a simple linear regression model. The true model is as follow:
+`GADGET` centers around an experiment object which collects all components of the experiment (e.g. design criterion, samplers, simulators, collected data etc.) into a single package. `GADGET` iteratively performs operations to this experiment object to conduct each stage of the experiment. `GADGET` was designed to work with batch-sequential experiments so depending on the user's setting will cycle through a design phase, a data collection phase, and a posterior update phase. 
+
+Next we will define all the necessary functions to create a `GADGET` experiment. We will use a simple linear regression model as follows:
 
 ```{r}
 #model: E[y] = beta_0 + x*beta_1
@@ -60,7 +62,7 @@ true_sigma <- 20
 
 ### Posterior Sampler ###
 
-`GADGET` is designed for Bayesian experiments, by default it assumes a posterior sampler is supplied by the user. Any algorithm can be used to sample the parameter posterior(s). `GADGET` assumes these sample are returned as `coda` objects. In our example the design criterion does not need a posterior sample to compute the expected utility of a design, so this posterior sampler does not need to produce real posterior samples. For completeness though we will utilize `MCMCpack` to sample the posteriors. To further simplify the problem we will assume the error variance is known. 
+`GADGET` is designed for Bayesian experiments; by default it assumes a posterior sampler is supplied by the user. Any algorithm can be used to sample the parameter posterior(s). `GADGET` passes the posterior sample directly to the design criterion, so the user does not need to recast the samples into a particular data structure. In our example the design criterion does not need a posterior sample to compute the expected utility of a design, so this posterior sampler does not need to produce real posterior samples, but for completeness we will utilize `MCMCpack` to sample the posteriors. To further simplify the problem we will assume the error variance is known. 
 
 ```{r}
 #--- Create a posterior sampler for parameter beta ---#
@@ -82,12 +84,12 @@ posterior_sampler   <- function(design,response,parms) {
 }
 ```
 
-### Computer Simulation ###
+### Data Acquisition or Computer Simulation ###
 
-`GADGET` was designed to sequentially design and run computer experiments. Therefore, it will need to access a simulator to collect additional data into the design after every stage of the experiment before moving to the next design phase. This is simple to do if there is an `R` function that can simulate new model responses. For our example we have the following simulator:
+`GADGET` was designed to sequentially design and run experiments. There are two ways of introducing newly acquired data into a `GADGET` experiment. The first is to proved the experiment with a simulator callable from `R`. `GADGET` will automatically call the simulator to collect additional data into the design after every stage of the experiment before moving to the next design phase. For our example we have the following simulator:
 
 ```{r}
-pred_parms = list(sigma=true_sigma) #we are assuming sigma is known
+pred_parms = list(sigma=true_sigma) #assuming sigma is known
 
 predictive_sampler  <-  function(design_point,beta,parms) {
   beta[1] + beta[2]*design_point + rnorm(1,0,parms$sigma)
@@ -98,15 +100,15 @@ simulation <- function(design_point) {
 }
 ```
 
-If it is real data then the data will need to be manually entered after each stage of the design. Setting simulation to `NULL` will cause `GADGET` to stop execution and wait for new data to be supplied by the user using the `add_data` function. Once data is added, the user can restart `GADGET` and perform the next design phase. This process should be used if: (1) data is coming from a physical experiment, (2) data is coming from a simulator that cannot be run locally through `R` or (3) the simulator needs to be precisely run using random seeds for reproduciblity and it cannot be left to chance. 
+The second way of adding new data is to manually entered it after each stage of the design. Setting simulation to `NULL` will cause `GADGET` to stop execution and wait for new data to be supplied by the user using the `add_data` function. Once data is added, the user can restart the experiment and perform the next design phase. This process should be used if: (1) data is coming from a physical experiment, (2) data is coming from a simulator that cannot be run locally through `R` or (3) the simulator needs to be precisely run using random seeds for reproduciblity and it cannot be left to chance. 
 
 ### Initial Data ###
 
-Depending on the circumstances of the experiment, you may have data already available to you. Here we will include two points that have already been run. 
+`GADGET` allows data to be be passed into the experiment initial. Here we will include two points that have already been run. 
 
 ```{r}
-design       <-  matrix(c(24,26),ncol=1) #I don't need to model the
-response     <-  matrix(vapply(design,simulation,rep(0,1)),ncol=1) #I don't know if I am using this quite correctly
+design       <-  matrix(c(24,26),ncol=1) 
+response     <-  matrix(vapply(design,simulation,rep(0,1)),ncol=1)
 ```
 
 ### Putting it all Together ###
@@ -128,53 +130,51 @@ my_experiment <- create_dc_experiment(design_criteria    = slr_d_optimal,
                                       )
 ```
 
-`GADGET` is designed to be run in sequential batch mode, where a computer simulation is run (possibly multiple times) at the end of each stage to gather new data and proceed to the next design phase. The size (number of design points) of each batch is defined by the `batch` option. The `design_budget` option specifies the number of design phases to perform. The total number of experimental units is `batch * design_budget`. Setting `batch = n` and `design_budget = 1` will attempt to find a single static $n$-point design (for some particular integer value of $n$). Here we will utilize two stages of four design points each. 
+`GADGET` is designed to run in sequential batch mode, where a computer simulation is run (possibly multiple times) at the end of each stage to gather new data and proceed to the next design phase. The size (number of design points) of each batch is defined by the `batch` option. The `design_budget` option specifies the number of design phases to perform. The total number of experimental units is `batch * design_budget`. Setting `batch = n` and `design_budget = 1` will attempt to find a single static $n$-point design (for some particular integer value of $n$). Here we will utilize two stages of four design points each. 
 
-For each design phase `GADGET` will explore the design space to find the optimal design. The amount of effort `GADGET` uses is defined by the `explore_budget` vector. The first element is the number of latin hypercube sampled designs to evaluate using the design criterion. A GP is fit to these sampled designs to predict the design criterion surface over the design space. The second element is the number of iteration of the expected quantile improvement (EQI) criterion is used to estimate the optimal design. `GADGET` uses GP optimization from the `DiceOptim` package.
+For each design phase, `GADGET` will explore the design space to find the optimal design. The amount of effort `GADGET` uses is defined by the `explore_budget` vector. The first element is the size of Latin Hypercube Design on which to evaluate the design criterion. A GP is fit to these sampled points to estimate the design criterion surface over the design space. The second element is the number of iterations of the expected quantile improvement (EQI) criterion used to estimate the optimal design. `GADGET` uses GP optimization from the `DiceOptim` package.
 
 ### Run the Experiment ###
 
-```{r}
+The experiment is run using the `run_dc_experiment` function. This function will return the updated experiment object after `GADGET` has exhausted the `design_budget` or needs data additional experimental data. 
+
+```{r, warning=FALSE}
 my_experiment <- run_dc_experiment(my_experiment)
 ```
 
-GADGET produces a reasonable design close to be being a balanced two point design as we would expect. Further tweaking may be required and multiple runs of the algorithm to be tried before actually collecting new data. 
-
-```{r, eval=FALSE,echo = FALSE}
-summary(my_experiment)
-```
+GADGET produces a design close to the expected two-point D-optimal design. Further adjustments may be required and multiple runs of the algorithm tried before actually collecting new data. 
 
 ```{r}
-print("Stage 1 Design Points:")
+#Stage 1 Design Points:#
 print(my_experiment$design[2+(1:4),])
-print("Stage 2 Design Points:")
+#Stage 2 Design Points:#
 print(my_experiment$design[6+(1:4),])
 ```
 
-GADGET saves all the stages so diagnostic information. In a future release there will be more function to facilitate accessing this information. This one shows the output of the design criterion evaluations, EQI values, and the estimated nugget effect within a stage of the experiment. These can be used to diagnose convergence issues of the GP and the EQI algorithm. 
+`GADGET` saves the output from each stage for diagnostic purpose. In a future release there will be more functions to facilitate accessing this information. Here we see the output of the design criterion evaluations, EQI values, and the estimated nugget effect within stage one of the experiment. These can be used to diagnose convergence issues of the GP and the EQI algorithm. 
 
 ```{r}
 stage = 1
-print("LHS Exploration Step of Stage 1")
+#LHS Exploration Step of Stage 1#
 my_experiment$stage_output[[stage]][[1]]
-print("EQI Exploration Step of Stage 1")
+#EQI Exploration Step of Stage 1#
 my_experiment$stage_output[[stage]][[2]]
 ```
 
-The posterior samples are also saved for analysis after GADGET has run. The posteriors are saved directly as whatever object type the posterior sampler uses. In this case you can use `coda` to analyze the MCMC chains. 
+The posterior samples are also saved for analysis after `GADGET` has run. The posteriors are saved directly as whatever object type the posterior sampler uses. In our case we can use `coda` to analyze the MCMC chains. 
 
 ```{r}
-#Stage 2 Posterior Sample 
+#Stage 2 Posterior Sample# 
 summary(my_experiment$post[[2]])
 ```
 
 # Extensions # 
 
-There are a number of extensions which GADGET can accomidate, but it may take some ingenuity to get `GADGET` to compute the design. In the future these feature will be made more streamlined in the package. 
+There are a number of extensions which `GADGET` can accommodate, but it may take some ingenuity to compute the design. In the future these features will be streamlined in the package. 
 
 ### Pseudo-Continuous Designs ###
 
-`GADGET` default to specifying discrete designs. This may be infficient depending on the circumstances, especially here because we know that the optimal design is a two point design. This can be remeded by changing the design criterion slightly and incorporating an extra design variable into $\eta$. The user needs to decide how to evaluate (or round) the continuous design. 
+`GADGET` defaults to specifying discrete designs. This is not necessarily ideal because it means the design space of $\eta$ is high dimensional which can cause problems with fitting the GP for EQI. Moreover, this may be inefficient depending on the circumstances, especially here because we know that the optimal design is a two point design. This can be remedied by changing the design criterion slightly and incorporating an extra design variable into $\eta$. The user needs to decide how to evaluate (or round) the continuous design within their design criterion. 
 
 ```{r}
 two_pt_slr_d_optimal <- function(batch_design,
@@ -212,7 +212,7 @@ The bounds on the proportion are restricted to $[0.05,0.95]$ to prevent the two 
 my_experiment <- run_dc_experiment(my_experiment,verbose = FALSE)
 ```
 
-Optimizing this formulation of the design criterion is more difficult and requires a larger exploration budget this it was given in this example. 
+Optimizing this formulation of the design criterion is more difficult and requires a larger exploration budget than it was given in this example. 
 
 ```{r}
 add_data(my_experiment)
