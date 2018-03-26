@@ -8,5 +8,5 @@ To install GADGET from github, use the `install_github` function from the `devto
 ```{r}
 install.packages('devtools')
 library(devtools)
-devtools::install_github('http://github.com/isaacmichaud/GADGET')
+devtools::install_github('isaacmichaud/GADGET')
 ```
