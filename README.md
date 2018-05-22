@@ -10,3 +10,26 @@ install.packages('devtools')
 library(devtools)
 devtools::install_github('isaacmichaud/GADGET')
 ```
+
+`devtools` does not utilize the proxy server setting used by `install.packages`. To set a proxy server you must use the `httr` package.
+
+```{r}
+install.packages('devtools')
+library(devtools,httr)
+with_config(use_proxy(Sys.getenv('http_proxy')), devtools::install_github('isaacmichaud/GADGET'))
+```
+
+## Dependencies
+
+Packages are available on CRAN.
+
+### Required
+ - DiceKriging
+ - DiceOptim
+ - lhs
+ - utils
+
+### Suggested
+ - MCMCpack
+ - knitr
+ - rmarkdown
