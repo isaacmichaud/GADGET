@@ -10,15 +10,16 @@ Description: Computes near-optimal batch-sequential Bayesian experimental design
 License: LGPL (>= 3)
 LazyData: TRUE
 RoxygenNote: 6.0.1
-Imports: 
+Imports:
     DiceKriging, 
     DiceOptim,  
-    lhs, 
+    DiceDesign, 
     utils,
-Suggests: 
+Suggests:
     MCMCpack,
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 NeedsCompilation: no
 Maintainer: Isaac Michaud <ijmichau@ncsu.edu>
 BugReports: https://github.com/isaacmichaud/GADGET/issues

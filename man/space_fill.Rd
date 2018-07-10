@@ -2,15 +2,22 @@
 % Please edit documentation in R/space_fill.R
 \name{space_fill}
 \alias{space_fill}
-\title{Create space-filling design}
+\title{Create Space-Filling Design}
 \usage{
 space_fill(experiment)
 }
 \arguments{
-\item{experiment}{a GADGET experiment object}
+\item{experiment}{GADGET experiment object}
+}
+\value{
+matrix of size n by k*b
 }
 \description{
-Each stage of a GADGET experiment starts by estimate the current design criterion
+Each stage of a GADGET experiment starts by estimated the current design criterion
 surface using a latin hypercude sample (LHS). This function computes the multidimensional
-LHS given the initial design budget and the boundary constraints of the design space.
+LHS given the initial exploration budget, boundary constraints, and batch size.
+}
+\examples{
+experiment <- list(lower=0,upper=50,batch=4,explore_budget=c(20,2),num_parms=1)
+my_lhs     <- space_file(experiment)
 }
