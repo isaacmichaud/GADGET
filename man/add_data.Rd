@@ -2,15 +2,24 @@
 % Please edit documentation in R/add_data.R
 \name{add_data}
 \alias{add_data}
-\title{Add Experimental Data}
+\title{Manually Add Experimental Data}
 \usage{
-add_data(experiment, new_response = NULL)
+add_data(experiment, new_response = NULL, confirm = TRUE)
 }
 \arguments{
 \item{experiment}{GADGET experiment object}
 
-\item{new_response}{matrix where each row is the response for the corresponding row of the current batch design computed by GADGET}
+\item{new_response}{matrix where each row is the response for the corresponding row of the current batch design}
+
+\item{confirm}{a logical value indicating whether to prompt user for confirmation before adding new data}
+}
+\value{
+next design points if no response provided; GADGET experiment if response provided
 }
 \description{
-Merges newly collected data with the current stage of the GADGET experiment.
+Merge newly collected data with the current stage of the GADGET experiment and prepares the experiment for the next stage of the experiment. This function is used to add collected data from either physical experiments or long-running computer experiments.
+}
+\examples{
+experiment <- list(lower=0,upper=50,batch=4,explore_budget=c(20,2),num_parms=1,next_batch=c(35,47,2,40))
+add_data(experiment)
 }

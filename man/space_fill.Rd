@@ -10,11 +10,11 @@ space_fill(experiment)
 \item{experiment}{GADGET experiment object}
 }
 \value{
-matrix of size n by k*b
+LHS design as matrix of size n by k*b
 }
 \description{
 Each stage of a GADGET experiment starts by estimated the current design criterion
-surface using a latin hypercude sample (LHS). This function computes the multidimensional
+surface using a maximin latin hypercude sample (LHS). This function computes the multidimensional
 LHS given the initial exploration budget, boundary constraints, and batch size.
 }
 \examples{
