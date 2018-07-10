@@ -4,7 +4,7 @@
 \alias{run_dc_experiment}
 \title{Run GADGET utility experiment}
 \usage{
-run_dc_experiment(experiment, verbose = FALSE)
+run_dc_experiment(experiment, verbose = FALSE, cluster = NULL)
 }
 \arguments{
 \item{experiment}{GADGET utility experiment object}

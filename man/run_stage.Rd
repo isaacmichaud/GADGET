@@ -4,7 +4,7 @@
 \alias{run_stage}
 \title{Run experiment stage}
 \usage{
-run_stage(experiment, design_criteria)
+run_stage(experiment, design_criteria, cluster = NULL)
 }
 \arguments{
 \item{experiment}{GADGET experiment object}

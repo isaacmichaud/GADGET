@@ -6,12 +6,26 @@
 #' @param experiment GADGET utility experiment object
 #' @param verbose logical. If FALSE extra output is suppressed.
 #' @export
-run_dc_experiment <- function(experiment, verbose = FALSE) {
+run_dc_experiment <- function(experiment, verbose = FALSE, cluster = NULL) {
   EXP         <- experiment
   budget      <- EXP$design_budget
   stage       <- EXP$stage
   next_action <- EXP$next_action
   batch       <- EXP$batch
+  
+  if (is.integer(cluster)) {
+    cl                <- parallel::makePSOCKcluster(cluster)
+    cluster_flag      <- TRUE
+    made_cluster_flag <- TRUE
+  } else if (!is.null(cluster)) {
+    cl                <- cluster
+    cluster_flag      <- TRUE
+    made_cluster_flag <- FALSE
+  } else {
+    cl                <- NULL
+    cluster_flag      <- FALSE
+    made_cluster_flag <- FALSE
+  }
   
   while (stage <= budget) { #this is the outer-loop
     
@@ -34,7 +48,11 @@ run_dc_experiment <- function(experiment, verbose = FALSE) {
         return(EXP$dc(batch_design,post_sample,design,response))
       }
       
-      EXP             <- run_stage(EXP,design_criteria = my_dc);
+      #if (cluster_flag) {
+      #  parallel::clusterExport(cl, 'my_dc')
+      #}
+  
+      EXP             <- GADGET::run_stage(EXP, design_criteria = my_dc, cluster = cl);
       EXP$next_action <- 3
       
     } else if (next_action == 3) { #get new data
@@ -60,5 +78,11 @@ run_dc_experiment <- function(experiment, verbose = FALSE) {
   if (verbose ==TRUE) {
     summary(EXP)
   }
+  
+  # clean up the cluster if GADGET made one
+  if (made_cluster_flag) {
+    parallel::stopCluster(cl)
+  }
+  
   return(EXP)
 }

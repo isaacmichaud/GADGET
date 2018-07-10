@@ -9,17 +9,15 @@
 #' @param experiment GADGET experiment object
 #' @param design_criteria valid GADGET design criterion
 #'
-run_stage <- function(experiment,design_criteria) {
+run_stage <- function(experiment, design_criteria, cluster = NULL) {
 
-  #require(DiceOptim) #needed for EQI routine
-  #require(utils) #needed for tail function
   print(paste("Running Stage: ", experiment$stage))
   
   budget_LHS <- experiment$explore_budget[1]
   budget_EQI <- experiment$explore_budget[2]
   budget     <- budget_LHS + budget_EQI
   stage      <- experiment$stage
-  posterior  <- experiment$post[[stage]] #let's suppose that the posterior sample is a list of parameters values
+  posterior  <- experiment$post[[stage]] 
   batch      <- experiment$batch
   upper      <- experiment$upper
   lower      <- experiment$lower
@@ -41,13 +39,14 @@ run_stage <- function(experiment,design_criteria) {
 
 # --- Get inital Latin Hypercube Design --- #
   xlhs  <- space_fill(experiment)
-  ylhs  <- matrix(0, nrow = budget_LHS, ncol = 1)
-  for (i in 1:budget_LHS) {
-    ylhs[i,1] <- dc(xlhs[i,])
+  if (is.null(cluster)) {
+    ylhs  <- matrix(0, nrow = budget_LHS, ncol = 1)
+    for (i in 1:budget_LHS) {
+      ylhs[i,1] <- dc(xlhs[i,])
+    }
+  } else {
+    ylhs <- matrix(parallel::parApply(cl = cluster, xlhs, 1, dc), nrow = budget_LHS, ncol = 1)
   }
-  
-  #print(xlhs)
-  #print(ylhs)
 
 # --- Run through the EQI budget --- #
   for (i in 1:budget_EQI) { #inner loop
@@ -106,8 +105,10 @@ run_stage <- function(experiment,design_criteria) {
                                           ))
 
   experiment$next_batch <- utils::tail(xlhs,1)
-  print("Next Batch:")
-  print(experiment$next_batch)
+  #if (experiment$verbous) {
+    cat("Next Batch:")
+    cat(experiment$next_batch)
+  #}
   #experiment$next_batch <- matrix(tail(xlhs,1),ncol=num_parms,byrow=TRUE)  #need something here
   return(experiment)
 }
