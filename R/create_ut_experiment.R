@@ -67,7 +67,7 @@ experiment = list(
   batch = batch, #number in a single batch, need to address if this affects other budget
   gp_options = gp_options,
   next_action = 1,
-  next_batch = list(),
+  next_batch = NULL,
   num_parms = length(upper_bound)
   )
 class(experiment) <- "GADGET_UT_EXP"

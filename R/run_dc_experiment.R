@@ -52,7 +52,7 @@ run_dc_experiment <- function(experiment, verbose = FALSE, cluster = NULL) {
       #  parallel::clusterExport(cl, 'my_dc')
       #}
   
-      EXP             <- GADGET::run_stage(EXP, design_criteria = my_dc, cluster = cl);
+      EXP             <- GADGET:::run_stage(EXP, design_criteria = my_dc, cluster = cl);
       EXP$next_action <- 3
       
     } else if (next_action == 3) { #get new data

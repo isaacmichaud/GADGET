@@ -139,7 +139,7 @@ For each design phase, `GADGET` will explore the design space to find the optima
 The experiment is run using the `run_dc_experiment` function. This function will return the updated experiment object after `GADGET` has exhausted the `design_budget` or needs data additional experimental data. 
 
 ```{r, warning=FALSE}
-my_experiment <- run_dc_experiment(my_experiment)
+my_experiment <- run_dc_experiment(my_experiment, cluster = 3L)
 ```
 
 GADGET produces a design close to the expected two-point D-optimal design. Further adjustments may be required and multiple runs of the algorithm tried before actually collecting new data. 

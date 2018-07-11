@@ -46,15 +46,15 @@ create_dc_experiment <- function(design_criteria,
   }
   
   experiment = list(
-    design = design,
+    design   = design,
     response = response,
-    upper = upper_bound,
-    lower = lower_bound,
+    upper    = upper_bound,
+    lower    = lower_bound,
     post_sim = posterior_sampler,
     post_parms = posterior_parms,
-    dc = design_criteria,
-    sim  = sim,
-    post = list(),
+    dc       = design_criteria,
+    sim      = sim,
+    post     = list(),
     stage_output = list(),
     stage = 1,
     design_budget  = design_budget, #number of point to add to the design
@@ -62,7 +62,7 @@ create_dc_experiment <- function(design_criteria,
     batch = batch, #number in a single batch, need to address if this affects other budget
     gp_options = gp_options,
     next_action = 1,
-    next_batch = list(),
+    next_batch = NULL,
     num_parms = length(upper_bound)
   )
   class(experiment) <- "GADGET_DC_EXP"
