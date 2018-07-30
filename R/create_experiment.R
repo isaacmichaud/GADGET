@@ -17,8 +17,6 @@ create_experiment <- function(design_criteria,
     stop("design budget must be greater than zero")
   } 
   
-  
-  
   if(is.null(simulation)) { #computer experiment? 
     sim <- NULL
   } else {

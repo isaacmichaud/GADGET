@@ -1,12 +1,11 @@
 Package: GADGET
-Type: Package
 Title: Gaussian Process Approximations for Designing Experiments
-Version: 0.11
+Version: 0.2.0
 Date: 2018-02-12
 Authors@R: c(person("Isaac", "Michaud", email = "ijmichau@ncsu.edu",role = c("aut", "cre")),
              person("Brian", "Weaver", role = c("aut")),
              person("Brian", "Williams", role = c("aut")))
-Description: Computes near-optimal batch-sequential Bayesian experimental designs using a Gaussian processes as a surrogate for expensive and noisy design criteria.
+Description: Computes near-optimal batch-sequential Bayesian experimental designs using Gaussian processes optimization.
 License: LGPL (>= 3)
 LazyData: TRUE
 RoxygenNote: 6.0.1

@@ -1,3 +1,6 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -5,20 +8,17 @@
 
 ## Installation
 
-To install `GADGET` from github, use the `install_github` function from
-the `devtools` package.
+To install `GADGET` from github, use the `install_github` function from the `devtools` package.  
 
-``` r
+```{r, eval = FALSE}
 install.packages('devtools')
 library(devtools)
 devtools::install_github('isaacmichaud/GADGET')
 ```
 
-`devtools` does not utilize the proxy server setting used by
-`install.packages`. To set a proxy server you must use the `httr`
-package.
+`devtools` does not utilize the proxy server setting used by `install.packages`. To set a proxy server you must use the `httr` package.
 
-``` r
+```{r, eval = FALSE}
 install.packages('devtools')
 library(devtools,httr)
 with_config(use_proxy(Sys.getenv('http_proxy')), devtools::install_github('isaacmichaud/GADGET'))
@@ -29,14 +29,12 @@ with_config(use_proxy(Sys.getenv('http_proxy')), devtools::install_github('isaac
 Packages are available on CRAN.
 
 ### Required
-
-  - DiceKriging
-  - DiceOptim
-  - lhs
-  - utils
+ - DiceKriging
+ - DiceOptim
+ - lhs
+ - utils
 
 ### Suggested
-
-  - MCMCpack
-  - knitr
-  - rmarkdown
+ - MCMCpack
+ - knitr
+ - rmarkdown
