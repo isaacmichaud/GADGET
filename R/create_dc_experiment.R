@@ -28,7 +28,8 @@ create_dc_experiment <- function(design_criteria,
                                  design_budget = 10,
                                  gp_options = list(),
                                  simulation=NULL,
-                                 simulation_parms=NULL
+                                 simulation_parms=NULL,
+                                 cluster = NULL #need to be careful with this thing
 ) {
   
   if(is.null(simulation)) { #this will tell us if we should call the simulation or

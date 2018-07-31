@@ -26,10 +26,10 @@ run_stage <- function(experiment, design_criteria, cluster = NULL) {
 # --- result collection data structures --- #
   all_models    <- list()
   design_points <- list() #use a list instead because it will be more general than a vector
-  eqi           <- NULL;#list()
-  nugget        <- NULL;#list()
-  var           <- NULL;#list()
-  response      <- NULL;#list()
+  eqi           <- NULL;
+  nugget        <- NULL;
+  var           <- NULL;
+  response      <- NULL;
 
 # if ( verbose == TRUE ) {
 #   report to the user what is currently being worked on
@@ -50,7 +50,7 @@ run_stage <- function(experiment, design_criteria, cluster = NULL) {
 
 # --- Run through the EQI budget --- #
   for (i in 1:budget_EQI) { #inner loop
-    gp_model <- fit_gp(experiment,design=xlhs,response=ylhs)
+    gp_model <- fit_gp(design=xlhs, response=ylhs, experiment$gp_options)
     model    <- gp_model$km.model
 
 #   if (diagnostics == TRUE) {

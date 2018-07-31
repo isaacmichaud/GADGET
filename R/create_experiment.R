@@ -1,21 +1,34 @@
 create_experiment <- function(design_criteria,
-                                 init_design = NULL,
-                                 init_response = NULL,
-                                 posterior_sampler,
-                                 posterior_parms = NULL,
-                                 lower_bound,
-                                 upper_bound,
-                                 batch=1,
-                                 explore_budget = c(10,10),
-                                 design_budget = 10,
-                                 gp_options = list(),
-                                 simulation=NULL,
-                                 simulation_parms=NULL
+                              init_design = NULL,
+                              init_response = NULL,
+                              posterior_sampler,
+                              posterior_parms = NULL,
+                              lower_bound,
+                              upper_bound,
+                              batch = 1,
+                              explore_budget = c(10,10),
+                              design_budget = 10,
+                              gp_options = list(formula=~1,
+                                                kernel = "matern5_2",
+                                                nugget=TRUE),
+                              simulation=NULL,
+                              simulation_parms=NULL
 ) {
   
-  if(design_budget < 1) {
-    stop("design budget must be greater than zero")
-  } 
+  #--- input checks ---# 
+  
+  if (design_budget < 1) stop("design budget must be greater than zero")
+  if (!is.vector(lower_bound)) stop("lower_bound must be a vector") 
+  if (!is.vector(upper_bound)) stop("upper_bound must be a vector")
+  if (prod((upper_bound - lower_bound) > 0) == 0) {
+    stop("upper_bound and lower_bound are incompatible, check that lower_bound < upper_bound")  
+  }
+  
+  if (is.null(gp_options$formula)) stop("gp_options does not specify a mean process formula")
+  if (is.null(gp_options$kernal))  stop("gp_options does not specify a covariance kernel")
+  if (is.null(gp_options$nugget))  stop("gp_options does not specify whether nugget is present")
+  
+  #--- initializations ---#
   
   if(is.null(simulation)) { #computer experiment? 
     sim <- NULL
@@ -27,13 +40,9 @@ create_experiment <- function(design_criteria,
     }
   }
   
-  if(length(gp_options)==0){
-    gp_options = list(formula=~1,kernel = "matern5_2",nugget=TRUE)
-  }
-  
   experiment = list(
-    design   = design,
-    response = response,
+    design   = init_design,
+    response = init_response,
     upper    = upper_bound,
     lower    = lower_bound,
     post_sim = posterior_sampler,
