@@ -1,19 +1,18 @@
-create_experiment <- function(design_criteria,
-                              init_design = NULL,
-                              init_response = NULL,
-                              posterior_sampler,
-                              posterior_parms = NULL,
-                              lower_bound,
-                              upper_bound,
-                              batch = 1,
-                              explore_budget = c(10,10),
-                              design_budget = 10,
-                              gp_options = list(formula=~1,
-                                                kernel = "matern5_2",
-                                                nugget=TRUE),
-                              simulation=NULL,
-                              simulation_parms=NULL
-) {
+sequential_experiment <- function(design_criteria,
+                                  posterior_sampler, #if we have a posterior_sampler, assume that design_criterion can accept it as an argument
+                                  lower_bound,       #design point lower bound
+                                  upper_bound,       #design point upper bound
+                                  init_design    = NULL,
+                                  init_response  = NULL,
+                                  batch          = 1,
+                                  init_budget    = 10, #per iteration dc budget
+                                  optim_budget   = 10,
+                                  design_budget  = 10, #number of batches
+                                  gp_options     = list(formula=~1,
+                                                    kernel = "matern5_2",
+                                                    nugget=TRUE),
+                                  simulation     = NULL) #if null then physical experiment if extra parameters are needed create an anonymus function
+{
   
   #--- input checks ---# 
   

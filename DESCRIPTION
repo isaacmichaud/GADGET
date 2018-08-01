@@ -17,6 +17,7 @@ Imports:
     utils,
 Suggests:
     MCMCpack,
+    parallel,
     knitr,
     rmarkdown,
     testthat
