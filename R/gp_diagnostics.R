@@ -147,18 +147,30 @@ predictive_errors <- function(design, response, model, plot = TRUE, type = "SK")
 #' set.seed(123)
 #' # training data
 #' x   <- lhs::randomLHS(20,2)
-#' y   <- space_eval(x,bo09)
+#' y   <- space_eval(x,bo09_toy)
 #' # validation data
-#' v_x <- lhs::randomLHS(20,2)
-#' v_y <- space_eval(v_x,bo09)
+#' v_x <- lhs::randomLHS(25,2)
+#' v_y <- space_eval(v_x,bo09_toy)
+#' my_model <- km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=FALSE)
 #' validate_gp(v_x,v_y,my_model,verbose = TRUE)
 
 validate_gp <- function(design, response, model, type = "SK", verbose = FALSE) {
   #don't know how to do this exactly
+  browser()
   #easiest way is to just check the MD statistic
   #split the validation indices into the first half and the second half
   #if we have the extreme in either of the sections then we can report the request information...
+  res <- predictive_errors(design, response, model, plot = verbose, type = "SK") 
   
+  #Check Mahalanobis Distance Statistic
+  if (res$F_stat[1] < res$F_stat[2] | res$F_stat[1] > res$F_stat[3]) {
+    if (verbose) {
+      message("Mahalanobis distance statistic is extreme")
+    }
+    return(FALSE) 
+  } else {
+    return(TRUE) 
+  }
 }
   
   
