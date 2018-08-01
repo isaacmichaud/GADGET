@@ -4,7 +4,7 @@
 \alias{space_fill}
 \title{Create Space-Filling Design}
 \usage{
-space_fill(experiment)
+space_fill(lower_bound, upper_bound, budget, init_lhs)
 }
 \arguments{
 \item{experiment}{GADGET experiment object}

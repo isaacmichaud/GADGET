@@ -22,3 +22,20 @@ space_fill <- function(lower_bound, upper_bound, budget, init_lhs) {
   }
   return(opt_lhs)
 }
+
+#evaluates the design criterion on a space filling design (or actually an matrix of observations)
+#simplifies the code within design_experiment so that stuff isn't repeated
+
+#' Title
+#'
+#' @param lhs 
+#' @param design_criteria 
+#' @param cluster 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+space_eval <- function(lhs,design_criteria,cluster = NULL) {
+  pbapply::pbapply(lhs,1,design_criteria,cl = cluster)
+}

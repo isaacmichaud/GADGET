@@ -1,3 +1,5 @@
+#' Plot 1-D DiceKriging Gaussian Process Model
+
 plotGP = function(model,limits,steps) {
   require(DiceKriging)
   t = seq(limits[1],limits[2],steps)
@@ -10,12 +12,3 @@ plotGP = function(model,limits,steps) {
   lines(t,result$lower95,lty=2,col='blue')
   return(result)
 }
-
-getGP = function(doe,response) {
-  return(DiceKriging::km(formula=~1,design=doe,response=response,covtype='matern5_2',optim.method='BFGS',nugget.estim=TRUE))
-}
-
-x = matrix(seq(-1,1,0.1),ncol=1)
-y = matrix(x^2,ncol=1)
-
-my_model <- getGP(x,y)

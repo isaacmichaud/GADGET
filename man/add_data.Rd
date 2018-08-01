@@ -21,5 +21,6 @@ Merge newly collected data with the current stage of the GADGET experiment and p
 }
 \examples{
 experiment <- list(lower=0,upper=50,batch=4,explore_budget=c(20,2),num_parms=1,next_batch=c(35,47,2,40))
-add_data(experiment)
+add_data(experiment) #no data added
+add_data(experiment, new_response = c(1,2,3,4), confirm = FALSE) #data added
 }

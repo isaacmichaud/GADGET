@@ -6,8 +6,8 @@
 \usage{
 create_ut_experiment(utility, design, response, posterior_sampler,
   posterior_parms = NULL, lower_bound, upper_bound, batch = 1,
-  explore_budget = c(10, 10), design_budget = 10, gp_options = list(),
-  simulation = NULL, simulation_parms = NULL)
+  explore_budget = c(10, 10), design_budget = 10,
+  gp_options = list(), simulation = NULL, simulation_parms = NULL)
 }
 \arguments{
 \item{utility}{function which evaluates the utility of a proposed design}

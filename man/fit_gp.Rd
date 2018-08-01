@@ -4,14 +4,14 @@
 \alias{fit_gp}
 \title{Fit a Gaussian process to the design criterion surface}
 \usage{
-fit_gp(experiment, design, response)
+fit_gp(design, response, options)
 }
 \arguments{
-\item{experiment}{GADGET experiment object}
-
 \item{design}{a matrix of design points}
 
 \item{response}{a column of responses}
+
+\item{options}{a list of options for the GP fitting}
 }
 \description{
 The next batch of design points in the experiment are chosen by optimizing the

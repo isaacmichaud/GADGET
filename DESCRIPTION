@@ -8,11 +8,12 @@ Authors@R: c(person("Isaac", "Michaud", email = "ijmichau@ncsu.edu",role = c("au
 Description: Computes near-optimal batch-sequential Bayesian experimental designs using Gaussian processes optimization.
 License: LGPL (>= 3)
 LazyData: TRUE
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Imports:
     DiceKriging, 
     DiceOptim,  
-    DiceDesign, 
+    pbapply,
+    lhs,
     utils,
 Suggests:
     MCMCpack,
