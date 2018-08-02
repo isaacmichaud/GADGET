@@ -2,7 +2,7 @@
 % Please edit documentation in R/design_experiment.R
 \name{design_experiment}
 \alias{design_experiment}
-\title{Title}
+\title{Design Optimal Experiment using Gaussian Process Optimization}
 \usage{
 design_experiment(design_criterion, stochastic = TRUE, lower_bound,
   upper_bound, init_budget = 10, optim_budget = 10,
@@ -12,7 +12,7 @@ design_experiment(design_criterion, stochastic = TRUE, lower_bound,
   max_augment = 10, cluster = NULL)
 }
 \arguments{
-\item{design_criterion}{}
+\item{design_criterion}{(see details)}
 
 \item{stochastic}{}
 
@@ -37,5 +37,15 @@ design_experiment(design_criterion, stochastic = TRUE, lower_bound,
 \item{cluster}{}
 }
 \description{
-Title
+If it is a deterministic criterion then the minimum is taken over the entire set of dc runs instead of taking the last one. this is the simpliest implimentation of the method by Weaver et. al. this function will essentially be the same as run_stage this will perform the essential functions of Weaver's paper actually this can be used to optimize any black box stochastic function just put the objective function as the design_criterion and the resulting design will be the argmin of the
+}
+\details{
+
+}
+\examples{
+
+#static d-optimal
+#see vignettes
+
+
 }

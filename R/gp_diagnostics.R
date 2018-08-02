@@ -1,63 +1,60 @@
-# compute the pivoted-cholesky predictive errors for Gaussian process validation
-#this will form the basis of the diagnostics for GADGET GP fitting
-#' Title
+#' Gaussian Process Residuals
 #'
-#' @param design 
-#' @param response 
-#' @param model 
-#' @param plot 
-#' @param type 
+#' Computes the residuals of a Gaussian process (GP) model on a validation data set.  
+#' compute the pivoted-cholesky predictive errors for Gaussian process validation
+#this will form the basis of the diagnostics for GADGET GP fitting -> need to put more details about interpretation
 #'
-#' @return
+#' @param design   Validation design
+#' @param response Validation response
+#' @param model Gaussian process model object (km from Dice )
+#' @param plot Logical, plot residuals and QQ-plots, outliners are highlighted 
+#' @param type Kriging type: Simple Kriging "SK" or Universal Kriging "UK" 
+#' @references 
+#' Bastos, L. S., & O’Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438. https://doi.org/10.1198/TECH.2009.08019
+#' @return list including the Mahalanobis distance (MD), MD F-statistic, MD p-value, Pivoted-Cholesky residuals, and Standardized residuals  
 #' @export
 #'
 #' @examples
-#' # simple iid normal case
+#' #--- Simple iid Normal Example ---#
+#' set.seed(123)
 #' x        <- matrix(runif(20,-1.5,1.5),ncol=1) 
-#'y        <- matrix(rnorm(20),ncol = 1)
-#'my_model <- km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=FALSE)
-#'# validation data
-#'x        <- matrix(runif(20,-1,1),ncol=1)
-#'y        <- matrix(rnorm(20),ncol = 1)
-#'plotGP(my_model,c(-2,2),0.1)
-#'predictive_errors(matrix(x,ncol=1),matrix(y,ncol=1),my_model)
-
-#'f <- function(x) {
-#'  x^2 
-#'}
-#'#fit model 
-#'x        <- matrix(runif(20,-1.5,1.5),ncol=1) 
-#'y        <- matrix(f(x),ncol = 1)
-#'my_model <- km(formula=~.^2,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=FALSE)
-#'#validate model
-#'x        <- matrix(runif(20,-1.5,1.5),ncol=1) 
-#'y        <- matrix(f(x),ncol = 1)
-#'plotGP(my_model,c(-5,5),0.1)
-#'predictive_errors(matrix(x,ncol=1),matrix(y,ncol=1),my_model, type = "SK")
-#'predictive_errors(matrix(x,ncol=1),matrix(y,ncol=1),my_model, type = "UK")
-
-#'#y = matrix(f(x),ncol = 1)
-#this example demonstrates that the model does not fit well on the outside of original design
-predictive_errors <- function(design, response, model, plot = TRUE, type = "SK") {
-  preds      <- predict(model,design,type=type,cov.compute=TRUE)  
-  std_preds  <- (response - preds$mean)/sqrt(diag(preds$cov))
-  #these only work in one dimension
-  #plot(design,std_preds,pch=20, ylab="standardized residual")
-  #title(main = "Standardized Residuals")
+#' y        <- matrix(rnorm(20),ncol = 1)
+#' my_model <- DiceKriging::km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=TRUE)
+#' # validation data
+#' v_x         <- matrix(runif(25,-1,1),ncol=1)
+#' v_y         <- matrix(rnorm(25),ncol = 1)
+#' diagnostics <-gp_residuals(design = v_x, response = v_y,my_model)
+#'
+#'#--- Bastos and O'Hagan (2009) Two-input Toy Model ---#
+#' set.seed(123)
+#' # training data
+#' x   <- lhs::randomLHS(20,2)
+#' y   <- space_eval(x,bo09_toy)
+#' # validation data
+#' v_x <- lhs::randomLHS(25,2)
+#' v_y <- space_eval(v_x,bo09_toy)
+#' my_model    <- DiceKriging::km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=FALSE)
+#' diagnostics <- gp_residuals(v_x,v_y,my_model)
+gp_residuals <- function(design, response, model, plot = TRUE, type = "SK") {
+  colnames(design) <- colnames(model@X)
+  #design           <- data.frame(design = design) #get names correct
+  #correlated residuals
+  preds     <- predict(model,design,type=type,cov.compute=TRUE)  
+  std_preds <- (response - preds$mean)/sqrt(diag(preds$cov))
   
-  
-  D_MD = t(response - preds$mean)%*%solve(preds$cov)%*% (response - preds$mean) # Mahalanobis distance
-  
-  n = model@n
-  q = 0 #mean parameters (0 if SK)
-  m = nrow(design) # of validation 
-  F_stat <- D_MD * (n-q)/(m*(n-q-2))
-  print(c(F_stat,qf(0.025,m,n-q),qf(0.975,m,n-q)))
+  #mahalanobis distance
+  D_MD      <- t(response - preds$mean)%*%solve(preds$cov)%*% (response - preds$mean) 
+  n         <- model@n      #training sample size
+  q         <- model@p      #number mean process paramers 
+  m         <- nrow(design) #validation sample size 
+  F_stat    <- D_MD * (n-q)/(m*(n-q-2))
+  F_pvalue  <- 2*min(pf(F_stat,m,n-q),1 - pf(F_stat,m,n-q)) 
+  #c(F_stat,qf(0.025,m,n-q),qf(0.975,m,n-q))
   
   #pivoted cholesky residuals
-  pc <- chol(preds$cov,pivot = TRUE)
-  D_pc <- solve(t(pc))%*%(response - preds$mean)
-  pivots <- attr(pc,"pivot")
+  pc        <- chol(preds$cov,pivot = TRUE)
+  D_pc      <- solve(t(pc))%*%(response - preds$mean)
+  pivots    <- attr(pc,"pivot")
   
   if (plot == TRUE) {
     par(mfrow=c(2,2))
@@ -66,9 +63,11 @@ predictive_errors <- function(design, response, model, plot = TRUE, type = "SK")
     ind    <- (abs(std_preds) > 2)
     yrange <- 1.2*diff(range(std_preds))
     ylims  <- median(std_preds) + yrange*c(-0.5,0.5)
+    xlims  <- range(preds$mean) 
     plot(preds$mean[!ind],
          std_preds[!ind], 
-         ylim=ylims, 
+         ylim = ylims,
+         xlim = xlims,
          ylab = "Std Residual",
          xlab = "Prediction")
     for (i in 1:m) {
@@ -112,12 +111,17 @@ predictive_errors <- function(design, response, model, plot = TRUE, type = "SK")
     abline(0,1,lty=2,col='red')
     par(mfrow=c(1,1))
   }
-  return(list(MD = D_MD, F_stat = c(F_stat,qf(0.025,m,n-q),qf(0.975,m,n-q)),D_pc = data.frame(error =  D_pc, pivot = pivots)))
+  
+  return(list(MD = D_MD, 
+              F_stat = F_stat, 
+              F_pvalue = F_pvalue, 
+              D_pc = data.frame(residual =  D_pc, pivot = pivots), 
+              D_I = std_preds))
 }
 
 #' Automated Gaussian Process Validation
 #' 
-#' Automatically validates a Gaussian process (GP) using a seperate validation dataset not used in the fitting of the GP. The Bastos and O'Hagan (2009) empirical fit statistics are used to determine if the GP accurately predicts the validation data. It then determines roughly whether the model fits well enough.  
+#' Automatically validates a Gaussian process (GP) using a seperate validation dataset not used in the fitting of the GP. The Bastos and O'Hagan (2009) empirical fit statistics are used to determine if the GP accurately predicts the validation data. It then determines roughly whether the model fits well enough.Currently it uses the Mahalanobis distance (MD) p-value to deterine the GP fit. This will be expanded in the future. 
 #'
 #' @param design validation design
 #' @param response validation response 
@@ -132,44 +136,36 @@ predictive_errors <- function(design, response, model, plot = TRUE, type = "SK")
 #' @export
 #'
 #' @examples 
-#' #--- simple iid normal example (assumptions hold) ---#
+#' #--- Simple iid Normal Example ---#
 #' # training data
+#' set.seed(123)
 #' x   <- matrix(runif(20,0,1),ncol=1) 
 #' y   <- matrix(rnorm(20),ncol = 1)
 #' # validation data
 #' v_x <- matrix(runif(20,-1,1),ncol=1)
 #' v_y <- matrix(rnorm(20),ncol = 1)
 #' my_model <- km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=FALSE)
-#' plot_gp(my_model,c(-0.1,1.1),0.01)
-#' validate_gp(v_x,v_y,my_model,verbose = TRUE)
+#' gp_validate(v_x,v_y,my_model,verbose = TRUE)
 #' 
-#' #--- Bastos and O'Hagan 2009 Two-Input Toy Example ---# 
+#'#--- Bastos and O'Hagan (2009) Two-input Toy Model ---#
 #' set.seed(123)
 #' # training data
-#' x   <- lhs::randomLHS(20,2)
-#' y   <- space_eval(x,bo09_toy)
+#' x        <- lhs::randomLHS(20,2)
+#' y        <- space_eval(x,bo09_toy)
 #' # validation data
-#' v_x <- lhs::randomLHS(25,2)
-#' v_y <- space_eval(v_x,bo09_toy)
-#' my_model <- km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=FALSE)
-#' validate_gp(v_x,v_y,my_model,verbose = TRUE)
-
-validate_gp <- function(design, response, model, type = "SK", verbose = FALSE) {
-  #don't know how to do this exactly
-  browser()
-  #easiest way is to just check the MD statistic
-  #split the validation indices into the first half and the second half
-  #if we have the extreme in either of the sections then we can report the request information...
-  res <- predictive_errors(design, response, model, plot = verbose, type = "SK") 
-  
-  #Check Mahalanobis Distance Statistic
-  if (res$F_stat[1] < res$F_stat[2] | res$F_stat[1] > res$F_stat[3]) {
+#' v_x      <- lhs::randomLHS(25,2)
+#' v_y      <- space_eval(v_x,bo09_toy)
+#' my_model <- DiceKriging::km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=FALSE)
+#' gp_validate(v_x,v_y,my_model,verbose = TRUE)
+gp_validate <- function(design, response, model, type = "SK", verbose = FALSE) {
+  res <- gp_residuals(design, response, model, plot = verbose, type = "SK") 
+  if (res$F_pvalue < 0.05) {
     if (verbose) {
       message("Mahalanobis distance statistic is extreme")
     }
     return(FALSE) 
   } else {
-    return(TRUE) 
+    return(TRUE)
   }
 }
   

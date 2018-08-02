@@ -7,11 +7,10 @@
 #' @param experiment GADGET experiment object
 #'
 #' @return LHS design as matrix of size n by k*b 
-#'
+#' @export
 #' @examples
 #' experiment <- list(lower=0,upper=50,batch=4,explore_budget=c(20,2),num_parms=1)
 #' my_lhs     <- space_file(experiment)
-
 space_fill <- function(lower_bound, upper_bound, budget, init_lhs) {
   n       <- budget
   k       <- length(lower_bound)
@@ -20,7 +19,7 @@ space_fill <- function(lower_bound, upper_bound, budget, init_lhs) {
   for (j in 1:k) { #shift and scale the space filling design
       opt_lhs[,j] <- (upper_bound[j]-lower_bound[j])*opt_lhs[,j] + lower_bound[j]
   }
-  return(opt_lhs)
+  return(data.frame(opt_lhs))
 }
 
 #evaluates the design criterion on a space filling design (or actually an matrix of observations)

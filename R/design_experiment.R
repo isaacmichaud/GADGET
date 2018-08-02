@@ -1,14 +1,8 @@
-#this function will essentially be the same as run_stage
-#this will perform the essential functions of Weaver's paper
-#actually this can be used to optimize any black box stochastic function
-#just put the objective function as the design_criterion and the resulting
-#design will be the argmin of the 
-
-# if it is a deterministic criterion then the minimum is taken over the entire set of dc runs instead of taking the last one. 
-#this is the simpliest implimentation of the method by Weaver et. al. 
-#' Title
+#' Design Optimal Experiment using Gaussian Process Optimization
+#' 
+#' If it is a deterministic criterion then the minimum is taken over the entire set of dc runs instead of taking the last one. this is the simpliest implimentation of the method by Weaver et. al. this function will essentially be the same as run_stage this will perform the essential functions of Weaver's paper actually this can be used to optimize any black box stochastic function just put the objective function as the design_criterion and the resulting design will be the argmin of the
 #'
-#' @param design_criterion 
+#' @param design_criterion  (see details)
 #' @param stochastic 
 #' @param lower_bound 
 #' @param upper_bound 
@@ -20,11 +14,18 @@
 #' @param verbose 
 #' @param max_augment 
 #' @param cluster 
+#' 
+#' @details
 #'
 #' @return
 #' @export
 #'
 #' @examples
+#' 
+#' #static d-optimal
+#' #see vignettes
+#' 
+#' 
 design_experiment <- function(design_criterion,
                               stochastic = TRUE, 
                               lower_bound,
@@ -99,7 +100,7 @@ design_experiment <- function(design_criterion,
       lhs_budget  <- 0
     }
     
-    gp_model <- fit_gp(design   = x_lhs, 
+    gp_model <- gp_fit(design   = x_lhs, 
                        response = y_lhs, 
                        options  = gp_options)
     model    <- gp_model$km.model
@@ -116,40 +117,55 @@ design_experiment <- function(design_criterion,
                                           cluster)
       }
       
+      if (num_augment == 0) {
+        warning("Maximum number of design augmentations reached. Manually Inspect GP fit.")
+        return(list(x_lhs,y_lhs,gp = model,gp_residuals(validation_design,validation_response,model,plot = FALSE), error = TRUE))
+      }
+      
       #automatic diagnostics 
       if (diagnostics == 1) {
-        #gp_validate()
-      } 
+        if(gp_validate(validation_design,validation_response,model)) {
+          augment     <- FALSE
+        } else {
+          #cat(sprintf(" F-statistic: %f (p-value = %f)\n \n Choose Action: \n", res$F_stat, res$F_pvalue))
+          augment     <- TRUE
+        }
+      }
       
       #manual diagnostics
       if (diagnostics == 2) {
-        #plot residuals 
-        #add more points if desired
-        #look at the current parameters and the optimization routine results
-        #suspend the operation for further study (save object too?)
+        res    <- gp_residuals(validation_design,validation_response,model,plot = TRUE)
+        
+        choice <- utils::menu(c("Augment Design","Skip Validation", "Terminate Design"),
+                              title = sprintf(" F-statistic: %f (p-value = %f)\n \n Choose Action: \n", res$F_stat, res$F_pvalue))
+        
+        if(choice == 1) {
+          augment     <- TRUE
+        }
+        
+        if (choice == 2) { #skip further validation
+          augment     <- FALSE
+        }
+        
+        if (choice == 3) { #terminate design 
+          message("Design Optimization Terminated")
+          return(list(x_lhs,y_lhs,gp_residuals(validation_design,validation_response,model,plot = FALSE), error = TRUE))
+        }
+
       }
       
       if (augment) {#add the validation data to the design, reattempt validation
+        message("Gaussian Process Failed to validate; augmenting design")
         x_lhs <- rbind(x_lhs, validation_design)
-        y_lhs <- rbind(y_lhs, validation_response)
+        y_lhs <- c(y_lhs, validation_response)
         validation_response <- NULL
         validation_design   <- NULL
-        gp_model    <- fit_gp(design=x_lhs, 
-                              response=y_lhs, 
-                              experiment$gp_options)
-        optimize    <- FALSE
-        num_augment <- num_augment - 1
-      }
-      
-      if (num_augment == 0) {
-        warnings("Maximum number of design augmentations reached. Manually Inspect GP fit.")
-        #dump the x_lhs and y_lhs 
-      }
-        
-      if (!augment) {
-        num_augment  <- max_augment
-        optimize     <- TRUE
-        diagnositics <- FALSE
+        optimize            <- FALSE
+        num_augment         <- num_augment - 1
+      } else {
+        num_augment <- max_augment
+        optimize    <- TRUE
+        diagnostics <- 0
       }
     }
     
@@ -213,14 +229,14 @@ design_experiment <- function(design_criterion,
                                           criterion = utils::tail(y_lhs,counter), 
                                           EQI       = eqi, 
                                           Nugget    = nugget,
-                                          Var       = var)))
+                                          Var       = var, error = FALSE)))
   } else {
     return(list(experiment   = x_lhs[which.min(y_lhs),],
                 gp           = model, 
                 optimization = data.frame(design    = utils::tail(x_lhs,counter), 
                                           criterion = utils::tail(y_lhs,counter), 
                                           EQI       = eqi, 
-                                          Var       = var)))
+                                          Var       = var, error = FALSE)))
   }
 }
   

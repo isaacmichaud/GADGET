@@ -9,7 +9,7 @@
 #' @param response a column of responses
 #' @param options a list of options for the GP fitting
 
-fit_gp <- function(design,response,options) {
+gp_fit <- function(design,response,options) {
 
   formula   <- options$formula
   covKernel <- options$kernel

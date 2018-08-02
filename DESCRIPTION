@@ -5,9 +5,10 @@ Date: 2018-02-12
 Authors@R: c(person("Isaac", "Michaud", email = "ijmichau@ncsu.edu",role = c("aut", "cre")),
              person("Brian", "Weaver", role = c("aut")),
              person("Brian", "Williams", role = c("aut")))
-Description: Computes near-optimal batch-sequential Bayesian experimental designs using Gaussian processes optimization.
-License: LGPL (>= 3)
+Description: Computes near-optimal Bayesian experimental designs with Gaussian processes optimization following the algorithm presented by Weaver et al. (2016) <doi:10.1214/15-BA945>. Additionally, batch-sequential computer experiments can be computed as well.
+License: GPL-3 
 LazyData: TRUE
+Encoding: UTF-8
 RoxygenNote: 6.1.0
 Imports:
     DiceKriging, 
@@ -15,8 +16,8 @@ Imports:
     pbapply,
     lhs,
     utils,
+    graphics
 Suggests:
-    MCMCpack,
     parallel,
     knitr,
     rmarkdown,
