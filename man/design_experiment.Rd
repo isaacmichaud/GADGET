@@ -47,7 +47,8 @@ For sequential computer experiments with inexpensive simulators, see \code{\link
 }
 \details{
 The design criterion (DC) is a univariate function that measures the quality of a proposed design. 
-It can be either stochastic or deterministic. 
+It can be either stochastic or deterministic.
+\code{GADGET} assumes the design criterion must be minimized. For example, instead of maximizing the determinant of the Fisher-information matrix, \code{GADGET} would minimize the negative determinant of the Fisher-information matrix.
 If the DC is stochastic then the GP model is fit with a nugget effect and expected quantile improvement (EQI) is used to perform the GP optimization. 
 The optimal design is taken to be the design that maximizes EQI on the final optimization iteration. 
 If the DC is deterministic then the GP model is fit without a nugget effect and expected improvement (EI) is used to perform the optimization.  

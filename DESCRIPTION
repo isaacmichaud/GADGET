@@ -1,11 +1,10 @@
 Package: GADGET
 Title: Gaussian Process Approximations for Designing Experiments
 Version: 0.2.0
-Date: 2018-02-12
 Authors@R: c(person("Isaac", "Michaud", email = "ijmichau@ncsu.edu",role = c("aut", "cre")),
              person("Brian", "Weaver", role = c("aut")),
              person("Brian", "Williams", role = c("aut")))
-Description: Computes near-optimal Bayesian experimental designs with Gaussian processes optimization following the algorithm presented by Weaver et al. (2016) <doi:10.1214/15-BA945>. Additionally, batch-sequential computer experiments can be computed as well.
+Description: Computes near-optimal Bayesian experimental designs with Gaussian processes optimization following the algorithm presented by Weaver et al. (2016) <doi:10.1214/15-BA945> for either physical or sequential computer experiments.
 License: GPL-3 
 LazyData: TRUE
 Encoding: UTF-8
@@ -20,10 +19,8 @@ Imports:
     stats
 Suggests:
     parallel,
-    knitr,
     rmarkdown,
     testthat
 NeedsCompilation: no
 Maintainer: Isaac Michaud <ijmichau@ncsu.edu>
 BugReports: https://github.com/isaacmichaud/GADGET/issues
-VignetteBuilder: knitr
