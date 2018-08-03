@@ -6,11 +6,10 @@
 \usage{
 sequential_experiment(design_criterion, stochastic, posterior_sampler,
   lower_bound, upper_bound, simulator, init_design = NULL,
-  init_response = NULL, batch = 1, init_budget = 10,
-  optim_budget = 10, design_budget = 10, gp_options = list(formula =
-  ~1, kernel = "matern5_2", optimizer = "gen"),
-  genoud_options = list(pop.size = 1000, max.generations = 100,
-  wait.generations = 10), diagnostics = 1, verbose = 1,
+  init_response = NULL, batch = 1, init_budget = 10, optim_budget = 10,
+  design_budget = 10, gp_options = list(formula = ~1, kernel = "matern5_2",
+  optimizer = "gen"), genoud_options = list(pop.size = 1000, max.generations =
+  100, wait.generations = 10), diagnostics = 1, verbose = 1,
   max_augment = 10, cluster = NULL)
 }
 \arguments{

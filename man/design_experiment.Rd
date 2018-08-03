@@ -6,10 +6,10 @@
 \usage{
 design_experiment(design_criterion, stochastic = TRUE, lower_bound,
   upper_bound, init_budget = 10, optim_budget = 10,
-  gp_options = list(formula = ~1, kernel = "matern5_2", optimizer =
-  "gen"), genoud_options = list(pop.size = 1000, max.generations = 100,
-  wait.generations = 10), diagnostics = 1, verbose = 1,
-  max_augment = 10, cluster = NULL)
+  gp_options = list(formula = ~1, kernel = "matern5_2", optimizer = "gen"),
+  genoud_options = list(pop.size = 1000, max.generations = 100,
+  wait.generations = 10), diagnostics = 1, verbose = 1, max_augment = 10,
+  cluster = NULL)
 }
 \arguments{
 \item{design_criterion}{(see details)}

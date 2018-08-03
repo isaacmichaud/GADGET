@@ -13,7 +13,7 @@ bo09_toy(x)
 Scalar
 }
 \description{
-A toy model for the demonstration of Gaussian process validation plots and statistics. It is a produce of a rational function in x[1] and an exponential function in x[2]. The function is smoother in x[2] than x[1].
+A toy model for the demonstration of Gaussian process validation plots and statistics. It is a product of a rational function in x[1] and an exponential function in x[2]. The function is smoother in x[2] than x[1].
 }
 \examples{
 print(bo09_toy(c(0.5,0.25)))
