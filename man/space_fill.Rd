@@ -4,20 +4,22 @@
 \alias{space_fill}
 \title{Create Space-Filling Design}
 \usage{
-space_fill(lower_bound, upper_bound, budget, init_lhs)
+space_fill(lower_bound, upper_bound, budget)
 }
 \arguments{
-\item{experiment}{GADGET experiment object}
+\item{lower_bound}{A vector of length \code{d}.}
+
+\item{upper_bound}{A vector of length \code{d}.}
+
+\item{budget}{An integer.}
 }
 \value{
-LHS design as matrix of size n by k*b
+A matrix of size \code{budget} x \code{d}.
 }
 \description{
-Each stage of a GADGET experiment starts by estimated the current design criterion
-surface using a maximin latin hypercude sample (LHS). This function computes the multidimensional
-LHS given the initial exploration budget, boundary constraints, and batch size.
+Generates a maximin latin hypercude sample (LHS) covering the space defined by \code{lower_bound} and \code{upper_bound} with \code{budget} number of points. The resulting LHS is shifted and scaled to the domain defined by  \code{lower_bound} and \code{upper_bound}.
 }
 \examples{
-experiment <- list(lower=0,upper=50,batch=4,explore_budget=c(20,2),num_parms=1)
-my_lhs     <- space_file(experiment)
+my_lhs <- space_fill(c(0,0),c(10,10),20)
+plot(my_lhs)
 }

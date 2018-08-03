@@ -1,21 +1,32 @@
-#' Plot 1-D DiceKriging Gaussian Process Model
+#' Plot 1D Gaussian Process Model
 #'
-#' Plots simple Gaussian process (GP) models with 95% credible bands. 
+#' Plots univariate Gaussian process (GP) models with 95\% credible bands. 
 #'
-#' @param model a km GP model from DiceKriging 
-#' @param inputs a vector of values at which to evaluate the GP model 
-#' @param plot_data logical, should the data used to generate the GP be plotted too? 
+#' @param model     A GP model of class \code{km} (see \code{\link[DiceKriging]{km-class}}).
+#' @param inputs    An vector of values at which to evaluate the GP model.
+#' @param plot_data Logical. Plot data used to fit the GP as well.
+#' 
+#' @return List of GP predictions used to generate the figure. 
 #' 
 #' @export
-#' @example 
+#' @examples 
+#' x  <- matrix(seq(-1,1,0.3),ncol=1)
+#' y  <- x^2 
+#' gp <- gp_fit(x,
+#'              y,
+#'              options=list(formula=~1, 
+#'              kernel = "matern5_2", 
+#'              optimizer = "gen", 
+#'              nuggetUse = FALSE))
+#' gp_plot(gp$km.model,seq(-1.5,1.5,0.1)) 
 gp_plot <- function(model,inputs, plot_data = FALSE) {
   inputs <- sort(inputs) 
-  y      <- predict(model,data.frame(design = inputs),type="SK")
+  y      <- stats::predict(model,data.frame(design = inputs),type="SK")
   top    <- max(y$upper95)
   bottom <- min(y$lower95)
-  plot(inputs,y$mean,type='l',ylim=c(bottom - abs(top-bottom)*0.25,top + abs(top-bottom)*0.25),xlab="design",ylab="response")
-  lines(inputs,y$upper95,lty=2,col='red')
-  lines(inputs,y$lower95,lty=2,col='blue')
-  points(model@X,model@y,pch=20)
+  graphics::plot(inputs,y$mean,type='l',ylim=c(bottom - abs(top-bottom)*0.25,top + abs(top-bottom)*0.25),xlab="design",ylab="response")
+  graphics::lines(inputs,y$upper95,lty=2,col='red')
+  graphics::lines(inputs,y$lower95,lty=2,col='blue')
+  graphics::points(model@X,model@y,pch=20)
   return(y)
 }

@@ -7,29 +7,37 @@
 gp_residuals(design, response, model, plot = TRUE, type = "SK")
 }
 \arguments{
-\item{design}{Validation design}
+\item{design}{Validation design matrix \code{n} x \code{d}.}
 
-\item{response}{Validation response}
+\item{response}{Validation response vector \code{n} x \code{1}.}
 
-\item{model}{Gaussian process model object (km from Dice )}
+\item{model}{A GP model of class \code{km} (see \code{\link[DiceKriging]{km-class}}).}
 
-\item{plot}{Logical, plot residuals and QQ-plots, outliners are highlighted}
+\item{plot}{Logical, plot residuals and QQ-plots (outliners are highlighted).}
 
-\item{type}{Kriging type: Simple Kriging "SK" or Universal Kriging "UK"}
+\item{type}{Kriging type: Simple Kriging "SK" or Universal Kriging "UK".}
 }
 \value{
-list including the Mahalanobis distance (MD), MD F-statistic, MD p-value, Pivoted-Cholesky residuals, and Standardized residuals
+List including the Mahalanobis distance (MD), MD F-statistic, MD p-value, pivoted-Cholesky residuals, and standardized residuals.
 }
 \description{
-Computes the residuals of a Gaussian process (GP) model on a validation data set.  
-compute the pivoted-cholesky predictive errors for Gaussian process validation
+This function computes standardized residuals and pivoted-Cholesky residuals of a Gaussian process (GP) model on a validation data set.  
+Mahalanobis distance and Mahalanobis p-value are calculated as well. 
+These statistics provide evidence for ill-fitting GP model and possible reasons for the lack-of-fit. 
+The residuals can be plotted against predicted values as well as QQ-plots to check the normality assumption.
 }
 \examples{
 #--- Simple iid Normal Example ---#
 set.seed(123)
-x        <- matrix(runif(20,-1.5,1.5),ncol=1) 
-y        <- matrix(rnorm(20),ncol = 1)
-my_model <- DiceKriging::km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=TRUE)
+# training data
+x           <- matrix(runif(20,-1.5,1.5),ncol=1) 
+y           <- matrix(rnorm(20),ncol = 1)
+my_model    <- DiceKriging::km(formula=~1,
+                               design=x,
+                               response=y,
+                               covtype='matern5_2',
+                               optim.method='BFGS',
+                               nugget.estim=TRUE)
 # validation data
 v_x         <- matrix(runif(25,-1,1),ncol=1)
 v_y         <- matrix(rnorm(25),ncol = 1)
@@ -43,9 +51,14 @@ y   <- space_eval(x,bo09_toy)
 # validation data
 v_x <- lhs::randomLHS(25,2)
 v_y <- space_eval(v_x,bo09_toy)
-my_model    <- DiceKriging::km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=FALSE)
+my_model    <- DiceKriging::km(formula=~1,
+                               design=x,
+                               response=y,
+                               covtype='matern5_2',
+                               optim.method='BFGS',
+                               nugget.estim=TRUE)
 diagnostics <- gp_residuals(v_x,v_y,my_model)
 }
 \references{
-Bastos, L. S., & O’Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438. https://doi.org/10.1198/TECH.2009.08019
+Bastos, L. S., & O’Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438, <doi:10.1198/TECH.2009.08019>.
 }

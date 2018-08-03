@@ -2,17 +2,30 @@
 % Please edit documentation in R/space_fill.R
 \name{space_eval}
 \alias{space_eval}
-\title{Title}
+\title{Evaluate Design Criterion on LHS}
 \usage{
-space_eval(lhs, design_criteria, cluster = NULL)
+space_eval(lhs, design_criterion, cluster = NULL)
 }
 \arguments{
-\item{lhs}{}
+\item{lhs}{Matrix (n x d) of n proposed designs.}
 
-\item{design_criteria}{}
+\item{design_criterion}{Function R^d -> R^q.}
 
-\item{cluster}{}
+\item{cluster}{A \code{parallel} cluster object.}
+}
+\value{
+Vector (q x n).
 }
 \description{
-Title
+This function simplifies the evaluatation of design criteria on space-filling designs (matrices were each row is a possible design). The design criterion is parallelized as well using the \code{parallel} package. A progress bar gives a visual indicator when the design criterion is expensive.
+}
+\details{
+Only univariate design criteria (i.e. q = 1) can be optimized \code{GADGET} currently.
+}
+\examples{
+my_lhs   <- space_fill(c(0,0),c(10,10),20)
+dc       <- function(x){sum(x^2)}
+response <- space_eval(my_lhs,dc)
+print(response) 
+
 }

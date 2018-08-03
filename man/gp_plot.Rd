@@ -2,17 +2,31 @@
 % Please edit documentation in R/gp_plot.R
 \name{gp_plot}
 \alias{gp_plot}
-\title{Plot 1-D DiceKriging Gaussian Process Model}
+\title{Plot 1D Gaussian Process Model}
 \usage{
 gp_plot(model, inputs, plot_data = FALSE)
 }
 \arguments{
-\item{model}{a km GP model from DiceKriging}
+\item{model}{A GP model of class \code{km} (see \code{\link[DiceKriging]{km-class}}).}
 
-\item{inputs}{a vector of values at which to evaluate the GP model}
+\item{inputs}{An vector of values at which to evaluate the GP model.}
 
-\item{plot_data}{logical, should the data used to generate the GP be plotted too?}
+\item{plot_data}{Logical. Plot data used to fit the GP as well.}
+}
+\value{
+List of GP predictions used to generate the figure.
 }
 \description{
-Plots simple Gaussian process (GP) models with 95% credible bands.
+Plots univariate Gaussian process (GP) models with 95\% credible bands.
+}
+\examples{
+x  <- matrix(seq(-1,1,0.3),ncol=1)
+y  <- x^2 
+gp <- gp_fit(x,
+             y,
+             options=list(formula=~1, 
+             kernel = "matern5_2", 
+             optimizer = "gen", 
+             nuggetUse = FALSE))
+gp_plot(gp$km.model,seq(-1.5,1.5,0.1)) 
 }

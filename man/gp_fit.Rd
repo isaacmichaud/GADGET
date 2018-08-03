@@ -2,20 +2,34 @@
 % Please edit documentation in R/gp_fit.R
 \name{gp_fit}
 \alias{gp_fit}
-\title{Fit a Gaussian process to the design criterion surface}
+\title{Fit a Gaussian Process Model}
 \usage{
-gp_fit(design, response, options)
+gp_fit(design, response, options = list(formula = ~1, kernel =
+  "matern5_2", optimizer = "gen", nuggetUse = TRUE))
 }
 \arguments{
-\item{design}{a matrix of design points}
+\item{design}{A matrix of designs \code{n} x \code{d}.}
 
-\item{response}{a column of responses}
+\item{response}{A vector of responses \code{n} x \code{1}.}
 
-\item{options}{a list of options for the GP fitting}
+\item{options}{A list specifing the type of GP model to fit (see \code{\link[DiceKriging]{km}}).}
+}
+\value{
+A list of properties from class \code{km} (see \code{\link[DiceKriging]{km-class}}).
 }
 \description{
-The next batch of design points in the experiment are chosen by optimizing the
-design criterion over the batch design space. This function updates the Gaussian
-process model which is used by EQI to sequentially find the best batch design
-given the current design and prior distribution.
+This function fits a Gaussian process (GP) model to set of possible designs and their corresponding design criterion evaluations. 
+This GP will then be used to optimize the design criterion using an expected improvement criterion.
+}
+\examples{
+x  <- matrix(seq(-1,1,0.3),ncol=1)
+y  <- x^2 
+gp <- gp_fit(x,
+             y,
+             options=list(formula=~1, 
+             kernel = "matern5_2", 
+             optimizer = "gen", 
+             nuggetUse = FALSE))
+gp_plot(gp$km.model,seq(-1.5,1.5,0.1))
+  
 }

@@ -1,41 +1,86 @@
 #' Design and Run Sequential Computer Experiment
 #'
-#' @param design_criteria function which evaluates the utility of a proposed design
-#' @param design list of design points that data have been collected
-#' @param response list of responses that have been collected
-#' @param posterior_sampler function that returns a sample from the posterior distribution
-#' @param posterior_parms list of parameters to pass to posterior_sampler
-#' @param lower_bound  vector containing the lower bound(s) of the design space
-#' @param upper_bound  vector containing the upper bound(s) of the design space
-#' @param batch number of design points per experiment stage (batch = 1 is sequential)
-#' @param explore_budget vector contain the number of initial space filling points and the number of EQI exploration points
-#' @param design_budget number of observation the experimental design should contain
-#' @param gp_options options that specify the type of Gaussian process to fit to the expected utility surface
-#' @param simulator computer simulator being explored (make it so that it is just a function of the design point)
-#' @param simulator_parms extra parameters to call the computer simulator with
+#' This function implements a sequential version of the method by Weaver et al. (2016) that uses Gaussian process (GP) optimization to estimate an optimal design for a stochastic design criterion. 
+#' The function \code{\link[GADGET]{design_experiment}} is used repeatedly to design each stage of the experiment. 
+#' After the design for each stage is estimated, an inexpensive simulator is run to collect data on the design. 
+#' New posterior samples are drawn, and the process is repeated. 
+#' Validation of the fitted GP models is provided by the statistics described in Bastos and O'Hagan (2009). 
+#' 
+#' @param design_criterion  Function R^d -> R^1 (see details). 
+#' @param lower_bound       A vector of length \code{d}.
+#' @param upper_bound       A vector of length \code{d}.
+#' @param stochastic        Logical, FALSE the design criterion is deterministic (see details).
+#' @param simulator         Computer simulator being explored. 
+#' @param posterior_sampler Function that sample from the posterior distribution given current observations (see details). 
+#' @param init_design   List of design points that data have been collected.
+#' @param init_response List of responses that have been collected.
+#' @param design_budget Number of sequential experiments to perform. 
+#' @param batch         Number of design points per experiment stage (batch = 1 is sequential) (see details)
+#' @param init_budget   An integer defining the size of the training and validation datasets for the GP model.  
+#' @param optim_budget  An integer defining the number of GP optimizations iterations.
+#' @param gp_options    A list specifing the type of GP model to fit (see \code{\link[DiceKriging]{km}}).  
+#' @param genoud_options A list specifing the control options to optimizer (see \code{\link[rgenoud]{genoud}}).  
+#' @param diagnostics    Type of GP diagnostics to perform before optimization occurs. There are currently three options: 0 (none), 1 (automatic) a simple Mahalanobis distance significance test, 2 (user inspected) execution is paused for visual inspection of pivoted-Cholesky residuals and QQ-plots.
+#' @param max_augment    An integer defining the maxmimum number of design augmentations before terminating GP fitting.
+#' @param verbose        Logical, print extra output during execution.  
+#' @param cluster        A \code{\link[parallel]{parallel}} cluster object.
+#' 
+#' @details 
+#' The design criterion (DC) is a univariate function that measures the quality of a proposed design. 
+#' It can be either stochastic or deterministic. 
+#' If the DC is stochastic then the GP model is fit with a nugget effect and expected quantile improvement (EQI) is used to perform the GP optimization. 
+#' The optimal design is taken to be the design that maximizes EQI on the final optimization iteration. 
+#' If the DC is deterministic then the GP model is fit without a nugget effect and expected improvement (EI) is used to perform the optimization.  
+#' The optimal design is taken to be the design with smallest observed DC over all evalaution of the DC. 
+#' 
+#' The \code{batch} allows for more than one design point to be optimized in a single step of \code{GADGET}. 
+#' To use this feature, the design criterion must be able to accept multiple design points stack in a matrix with each row being a single design point.
+#' 
+#' The \code{posterior_sampler} accepts the currently observed design and response (including the initial design and response) to produce posterior of simulator parameters.
+#' The design criterion also requires a second argument accepting the posterior sample so that the utility function is computed with the current posterior distribution.    
+#' 
 #' @export
+#' @examples
+#' #--- Synthetic Design Problem ---#
+#' \dontrun{ 
+#' #demonstration design criterion
+#' dc <- function(x,theta) {sum(x^2) + rnorm(1,0.1)}
+#' #demonstration posterior sampler 
+#' post <- function(design,response) {rnorm(1000)}
+#' #demonstration simulatior 
+#' sim <- function(x) {x}
+#' my_result = sequential_experiment(design_criterion  = dc,
+#'                                  stochastic        = TRUE,
+#'                                  posterior_sampler = post,
+#'                                  lower_bound   = -3,
+#'                                  upper_bound   =  3,
+#'                                  simulator     = sim,
+#'                                  design_budget = 2,
+#'                                  optim_budget  = 1,
+#'                                  batch         = 2)}
+
 sequential_experiment <- function(design_criterion,
+                                  posterior_sampler, 
+                                  lower_bound,       
+                                  upper_bound,       
                                   stochastic, 
-                                  posterior_sampler, #if we have a posterior_sampler, assume that design_criterion can accept it as an argument
-                                  lower_bound,       #design point lower bound
-                                  upper_bound,       #design point upper bound
                                   simulator, 
                                   init_design    = NULL,
                                   init_response  = NULL,
+                                  design_budget  = 10, 
                                   batch          = 1,
-                                  init_budget    = 10, #per iteration dc budget
+                                  init_budget    = 10, 
                                   optim_budget   = 10,
-                                  design_budget  = 10, #number of batches
                                   gp_options     = list(formula=~1,
                                                         kernel = "matern5_2",
                                                         optimizer = "gen"),
                                   genoud_options = list(pop.size = 1000,
                                                         max.generations = 100, 
                                                         wait.generations = 10),
-                                  diagnostics    = 1, #1 is recommended just for simpliciy
+                                  diagnostics    = 1, 
                                   verbose        = 1,
                                   max_augment    = 10,
-                                  cluster  = NULL) #if null then physical experiment if extra parameters are needed create an anonymus function
+                                  cluster  = NULL) 
 {
   
   #--- input checks ---# 

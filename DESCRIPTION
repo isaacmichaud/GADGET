@@ -12,11 +12,12 @@ Encoding: UTF-8
 RoxygenNote: 6.1.0
 Imports:
     DiceKriging, 
-    DiceOptim,  
-    pbapply,
+    DiceOptim,
     lhs,
+    pbapply,
     utils,
-    graphics
+    graphics,
+    stats
 Suggests:
     parallel,
     knitr,

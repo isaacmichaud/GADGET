@@ -2,11 +2,10 @@
 #'
 #' The \code{GADGET} package offers
 #'
-#' @section References:
-#' Gao, S., Ver Steeg G., & Galstyan A. (2015). Efficient estimation of mutual information for strongly dependent variables. Artificial Intelligence and Statistics: 277-286.
+#' @references Weaver, B. P., Williams, B. J., Anderson-Cook, C. M., Higdon, D. M. (2016). Computational enhancements to Bayesian design of experiments using Gaussian processes. Bayesian Analysis, 11(1), 191–213, <doi:10.1214/15-BA945>.
 #'
 #' @docType package
-#' @author Isaac Michaud
+#' @author Isaac Michaud, Brian Weaver, and Brian Williams
 #' @name GADGET
 NULL
 
@@ -16,7 +15,7 @@ NULL
 #'
 #' @return Nothing
 #' @keywords internal
-#'
+#' @export
 #' @examples
 #' print_logo()
 print_logo <- function() {
@@ -44,7 +43,7 @@ print_logo <- function() {
 #'
 #' @return Nothing
 #' @keywords internal
-#'
+#' @export
 #' @examples
 #' print_seperator()
 print_seperator <-function() {

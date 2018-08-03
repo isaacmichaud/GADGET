@@ -2,9 +2,12 @@
 
 export(bo09_toy)
 export(design_experiment)
+export(gp_fit)
 export(gp_plot)
 export(gp_residuals)
 export(gp_validate)
+export(print_logo)
+export(print_seperator)
 export(sequential_experiment)
 export(space_eval)
 export(space_fill)

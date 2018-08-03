@@ -7,21 +7,24 @@
 gp_validate(design, response, model, type = "SK", verbose = FALSE)
 }
 \arguments{
-\item{design}{validation design}
+\item{design}{Validation design matrix \code{n} x \code{d}.}
 
-\item{response}{validation response}
+\item{response}{Validation response vector \code{n} x \code{1}.}
 
-\item{model}{GP model from DiceKriging (class `km``)}
+\item{model}{A GP model of class \code{km} (see \code{\link[DiceKriging]{km-class}}).}
 
-\item{type}{simple of universal kriging}
+\item{type}{Kriging type: Simple Kriging "SK" or Universal Kriging "UK".}
 
-\item{verbose}{logical, print the resulting statistics and possible explainations for the GP's deficiency}
+\item{verbose}{Logical, print the conclusion of the validation.}
 }
 \value{
-logical, TRUE the GP is a valid emulator, FALSE the GP is an invalid emulator
+Logical. If \code{TRUE} the GP is a valid emulator, otherwise the GP is an invalid emulator.
 }
 \description{
-Automatically validates a Gaussian process (GP) using a seperate validation dataset not used in the fitting of the GP. The Bastos and O'Hagan (2009) empirical fit statistics are used to determine if the GP accurately predicts the validation data. It then determines roughly whether the model fits well enough.Currently it uses the Mahalanobis distance (MD) p-value to deterine the GP fit. This will be expanded in the future.
+Automatically validates a Gaussian process (GP) using a separate validation dataset not used in the fitting of the GP. 
+The Bastos and O'Hagan (2009) empirical fit statistics are used to determine if the GP accurately predicts the validation data. 
+It then determines roughly whether the model fits well enough. 
+Currently, it uses the Mahalanobis distance (MD) p-value to determine the GP fit.
 }
 \examples{
 #--- Simple iid Normal Example ---#
@@ -32,7 +35,12 @@ y   <- matrix(rnorm(20),ncol = 1)
 # validation data
 v_x <- matrix(runif(20,-1,1),ncol=1)
 v_y <- matrix(rnorm(20),ncol = 1)
-my_model <- km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=FALSE)
+my_model    <- DiceKriging::km(formula=~1,
+                               design=x,
+                               response=y,
+                               covtype='matern5_2',
+                               optim.method='BFGS',
+                               nugget.estim=TRUE)
 gp_validate(v_x,v_y,my_model,verbose = TRUE)
 
 #--- Bastos and O'Hagan (2009) Two-input Toy Model ---#
@@ -43,7 +51,12 @@ y        <- space_eval(x,bo09_toy)
 # validation data
 v_x      <- lhs::randomLHS(25,2)
 v_y      <- space_eval(v_x,bo09_toy)
-my_model <- DiceKriging::km(formula=~1,design=x,response=y,covtype='matern5_2',optim.method='BFGS',nugget.estim=FALSE)
+my_model    <- DiceKriging::km(formula=~1,
+                               design=x,
+                               response=y,
+                               covtype='matern5_2',
+                               optim.method='BFGS',
+                               nugget.estim=TRUE)
 gp_validate(v_x,v_y,my_model,verbose = TRUE)
 }
 \references{

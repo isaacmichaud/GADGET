@@ -1,35 +1,61 @@
 #' Design Optimal Experiment using Gaussian Process Optimization
 #' 
-#' If it is a deterministic criterion then the minimum is taken over the entire set of dc runs instead of taking the last one. this is the simpliest implimentation of the method by Weaver et. al. this function will essentially be the same as run_stage this will perform the essential functions of Weaver's paper actually this can be used to optimize any black box stochastic function just put the objective function as the design_criterion and the resulting design will be the argmin of the
+#' This function implements the method by Weaver et al. (2016) that uses Gaussian process (GP) optimization to estimate an optimal design for a stochastic design criterion.  
+#' This function can also optimize a deterministic design criterion as well. Validation of the fitted GP models is provided by the statistics described in Bastos and O'Hagan (2009). 
+#' For sequential physical experiments or computer experiments with an expensive simulator, one can repeatedly use this function to compute the next step's optimal design point. 
+#' For sequential computer experiments with inexpensive simulators, see \code{\link[GADGET]{sequential_experiment}} which will automatically run the simulator and continue the sequential design automatically. 
 #'
-#' @param design_criterion  (see details)
-#' @param stochastic 
-#' @param lower_bound 
-#' @param upper_bound 
-#' @param init_budget 
-#' @param optim_budget 
-#' @param gp_options 
-#' @param genoud_options 
-#' @param diagnostics 
-#' @param verbose 
-#' @param max_augment 
-#' @param cluster 
+#' @param design_criterion Function R^d -> R^1 (see details). 
+#' @param lower_bound  A vector of length \code{d}.
+#' @param upper_bound  A vector of length \code{d}.
+#' @param stochastic   Logical, FALSE the design criterion is deterministic (see details).
+#' @param init_budget  An integer defining the size of the training and validation datasets for the GP model.  
+#' @param optim_budget An integer defining the number of GP optimizations iterations.  
+#' @param gp_options   A list specifing the type of GP model to fit (see \code{\link[DiceKriging]{km}}).  
+#' @param genoud_options A list specifing the control options to optimizer (see \code{\link[rgenoud]{genoud}}).  
+#' @param diagnostics Type of GP diagnostics to perform before optimization occurs. There are currently three options: 0 (none), 1 (automatic) a simple Mahalanobis distance significance test, 2 (user inspected) execution is paused for visual inspection of pivoted-Cholesky residuals and QQ-plots.
+#' @param max_augment An integer defining the maxmimum number of design augmentations before terminating GP fitting.
+#' @param verbose     Logical, print extra output during execution.  
+#' @param cluster A \code{\link[parallel]{parallel}} cluster object.
 #' 
 #' @details
+#' The design criterion (DC) is a univariate function that measures the quality of a proposed design. 
+#' It can be either stochastic or deterministic. 
+#' If the DC is stochastic then the GP model is fit with a nugget effect and expected quantile improvement (EQI) is used to perform the GP optimization. 
+#' The optimal design is taken to be the design that maximizes EQI on the final optimization iteration. 
+#' If the DC is deterministic then the GP model is fit without a nugget effect and expected improvement (EI) is used to perform the optimization.  
+#' The optimal design is taken to be the design with smallest observed DC over all evalaution of the DC. 
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return A list containing the optimal design, diagnostic results, and final GP model.
+#' @references Weaver, B. P., Williams, B. J., Anderson-Cook, C. M., Higdon, D. M. (2016). Computational enhancements to Bayesian design of experiments using Gaussian processes. Bayesian Analysis, 11(1), 191–213, <doi:10.1214/15-BA945>.
+#' @export 
+#' @examples 
+#' #--- Deterministic D-Optimal Design ---#
+#' # design = c(x1,x2,p) (two point design with weight) 
+#' \dontrun{
+#' dc <- function(design) {
+#' fisher_mat <- (1-design[3])*c(1,design[2]) %*% t(c(1,design[2]))
+#' fisher_mat <- fisher_mat + design[3]*c(1,design[1]) %*% t(c(1,design[1]))
+#' return(-log(det(fisher_mat)))
+#' }
+#' #optim_budget is small for demonstration purposes 
+#' my_result <- design_experiment(dc,
+#'                                c(0,0.5,0),
+#'                                c(0.5,1,1),
+#'                                FALSE,
+#'                                optim_budget = 2) 
 #' 
-#' #static d-optimal
-#' #see vignettes
-#' 
+#' #- optimal design -#
+#' print(my_result$experiment)
+#' #- optimization report - #
+#' print(my_result$optimization)
+#' #- final gp model -#
+#' print(my_result$gp)}
 #' 
 design_experiment <- function(design_criterion,
-                              stochastic = TRUE, 
                               lower_bound,
                               upper_bound,
+                              stochastic     = TRUE, 
                               init_budget    = 10,
                               optim_budget   = 10,
                               gp_options     = list(formula=~1,
@@ -39,16 +65,25 @@ design_experiment <- function(design_criterion,
                                                     max.generations = 100, 
                                                     wait.generations = 10),
                               diagnostics    = 1,
+                              max_augment    = 10,
                               verbose        = 1, 
-                              max_augment    = 10, 
                               cluster        = NULL) {
   
   #--- input checks ---# 
   
   if (init_budget  < 1) stop("initial lhs budget must be greater than zero")
+  if (!(init_budget == as.integer(init_budget))) {
+    stop("init_budget must be an integer")
+  }
   if (optim_budget < 1) stop("optimization budget must be greater than zero")
+  if (!(optim_budget == as.integer(optim_budget))) {
+    stop("optim_budget must be an integer")
+  }
   if (!is.vector(lower_bound)) stop("lower_bound must be a vector") 
   if (!is.vector(upper_bound)) stop("upper_bound must be a vector")
+  if (!(length(lower_bound) == length(upper_bound))) {
+    stop("lower_bound and upper_bound are not the same length")
+  }
   if (prod((upper_bound - lower_bound) > 0) == 0) {
     stop("upper_bound and lower_bound are incompatible, check that lower_bound < upper_bound")  
   }
@@ -229,14 +264,14 @@ design_experiment <- function(design_criterion,
                                           criterion = utils::tail(y_lhs,counter), 
                                           EQI       = eqi, 
                                           Nugget    = nugget,
-                                          Var       = var, error = FALSE)))
+                                          Var       = var),error = FALSE))
   } else {
     return(list(experiment   = x_lhs[which.min(y_lhs),],
                 gp           = model, 
                 optimization = data.frame(design    = utils::tail(x_lhs,counter), 
                                           criterion = utils::tail(y_lhs,counter), 
                                           EQI       = eqi, 
-                                          Var       = var, error = FALSE)))
+                                          Var       = var), error = FALSE))
   }
 }
   
