@@ -1,12 +1,12 @@
 #' Create Space-Filling Design
 #'
-#' Generates a maximin latin hypercude sample (LHS) covering the space defined by \code{lower_bound} and \code{upper_bound} with \code{budget} number of points. The resulting LHS is shifted and scaled to the domain defined by  \code{lower_bound} and \code{upper_bound}.   
+#' Generates a maximin latin hypercube sample (LHS) covering the space defined by \code{lower_bound} and \code{upper_bound} with \code{budget} number of points. The resulting LHS is shifted and scaled to the domain defined by  \code{lower_bound} and \code{upper_bound}.   
 #'
 #' @param lower_bound A vector of length \code{d}.
 #' @param upper_bound A vector of length \code{d}.
 #' @param budget      An integer.  
 #'
-#' @return A matrix of size \code{budget} x \code{d}.
+#' @return A matrix with \code{budget} rows and \code{d} columns.
 #' @export
 #' @examples
 #' my_lhs <- space_fill(c(0,0),c(10,10),20)
@@ -25,15 +25,15 @@ space_fill <- function(lower_bound, upper_bound, budget) {
 
 #' Evaluate Design Criterion on LHS
 #' 
-#' This function simplifies the evaluatation of design criteria on space-filling designs (matrices were each row is a possible design). The design criterion is parallelized as well using the \code{parallel} package. A progress bar gives a visual indicator when the design criterion is expensive.
+#' This function simplifies the evaluation of design criteria on space-filling designs (matrices where each row is a possible design). The design criterion is parallelized as well using the \code{parallel} package. A progress bar gives a visual indicator when the design criterion is expensive.
 #'
-#' @param lhs Matrix (n x d) of n proposed designs. 
-#' @param design_criterion Function R^d -> R^q.
+#' @param lhs A matrix with \code{n} rows and \code{d} columns.
+#' @param criterion  A function with vector input of length \code{d}.
 #' @param cluster A \code{parallel} cluster object.
 #' 
-#' @details Only univariate design criteria (i.e. q = 1) can be optimized \code{GADGET} currently. 
+#' @details Only univariate design criteria can be optimized \code{GADGET} currently. 
 #'
-#' @return Vector (q x n).
+#' @return A row vector of length \code{n}.
 #' @export
 #'
 #' @examples my_lhs   <- space_fill(c(0,0),c(10,10),20)
@@ -41,6 +41,6 @@ space_fill <- function(lower_bound, upper_bound, budget) {
 #' response <- space_eval(my_lhs,dc)
 #' print(response) 
 #' 
-space_eval <- function(lhs,design_criterion,cluster = NULL) {
-  pbapply::pbapply(lhs,1,design_criterion,cl = cluster)
+space_eval <- function(lhs,criterion,cluster = NULL) {
+  pbapply::pbapply(lhs,1,criterion,cl = cluster)
 }

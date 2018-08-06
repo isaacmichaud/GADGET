@@ -1,37 +1,37 @@
 #' Design Optimal Experiment using Gaussian Process Optimization
 #' 
-#' This function implements the method by Weaver et al. (2016) that uses Gaussian process (GP) optimization to estimate an optimal design for a stochastic design criterion.  
+#' This function implements the method by Weaver, et al. (2016) that uses Gaussian process (GP) optimization to estimate an optimal design for a stochastic design criterion.  
 #' This function can also optimize a deterministic design criterion as well. Validation of the fitted GP models is provided by the statistics described in Bastos and O'Hagan (2009). 
 #' For sequential physical experiments or computer experiments with an expensive simulator, one can repeatedly use this function to compute the next step's optimal design point. 
 #' For sequential computer experiments with inexpensive simulators, see \code{\link[GADGET]{sequential_experiment}} which will automatically run the simulator and continue the sequential design automatically. 
 #'
-#' @param design_criterion Function R^d -> R^1 (see details). 
+#' @param criterion    A function with vector input of length \code{d} (see details). 
 #' @param lower_bound  A vector of length \code{d}.
 #' @param upper_bound  A vector of length \code{d}.
-#' @param stochastic   Logical, FALSE the design criterion is deterministic (see details).
-#' @param init_budget  An integer defining the size of the training and validation datasets for the GP model.  
-#' @param optim_budget An integer defining the number of GP optimizations iterations.  
-#' @param gp_options   A list specifing the type of GP model to fit (see \code{\link[DiceKriging]{km}}).  
-#' @param genoud_options A list specifing the control options to optimizer (see \code{\link[rgenoud]{genoud}}).  
+#' @param stochastic   Is the design criterion stochastic or deterministic (see details)? 
+#' @param init_budget  An integer defining the size of the initial training dataset and the size of the validation dataset for the GP model.  
+#' @param optim_budget An integer defining the number of GP optimization iterations.  
+#' @param gp_options   A list specifying the type of GP model to fit (see \code{\link[DiceKriging]{km}}).  
+#' @param genoud_options A list specifying the control options to optimizer (see \code{\link[rgenoud]{genoud}}).  
 #' @param diagnostics Type of GP diagnostics to perform before optimization occurs. There are currently three options: 0 (none), 1 (automatic) a simple Mahalanobis distance significance test, 2 (user inspected) execution is paused for visual inspection of pivoted-Cholesky residuals and QQ-plots.
-#' @param max_augment An integer defining the maxmimum number of design augmentations before terminating GP fitting.
-#' @param verbose     Logical, print extra output during execution.  
+#' @param max_augment An integer defining the maximum number of design augmentations before terminating GP fitting.
+#' @param verbose     Print extra output during execution?
 #' @param cluster A \code{\link[parallel]{parallel}} cluster object.
 #' 
 #' @details
-#' The design criterion (DC) is a univariate function that measures the quality of a proposed design. 
-#' It can be either stochastic or deterministic.
+#' The design criterion (DC) is a stochastic or deterministic univariate function that measures the quality of a proposed design. 
 #' \code{GADGET} assumes the design criterion must be minimized. For example, instead of maximizing the determinant of the Fisher-information matrix, \code{GADGET} would minimize the negative determinant of the Fisher-information matrix.
 #' If the DC is stochastic then the GP model is fit with a nugget effect and expected quantile improvement (EQI) is used to perform the GP optimization. 
 #' The optimal design is taken to be the design that maximizes EQI on the final optimization iteration. 
 #' If the DC is deterministic then the GP model is fit without a nugget effect and expected improvement (EI) is used to perform the optimization.  
-#' The optimal design is taken to be the design with smallest observed DC over all evalaution of the DC. 
+#' The optimal design is taken to be the design with smallest observed DC over all evaluation of the DC. 
 #'
 #' @return A list containing the optimal design, diagnostic results, and final GP model.
 #' @references Weaver, B. P., Williams, B. J., Anderson-Cook, C. M., Higdon, D. M. (2016). Computational enhancements to Bayesian design of experiments using Gaussian processes. Bayesian Analysis, 11(1), 191–213, <doi:10.1214/15-BA945>.
 #' @export 
 #' @examples 
 #' #--- Deterministic D-Optimal Design ---#
+#' # simple linear regression model
 #' # design = c(x1,x2,p) (two point design with weight) 
 #' \dontrun{
 #' dc <- function(design) {
@@ -53,7 +53,7 @@
 #' #- final gp model -#
 #' print(my_result$gp)}
 #' 
-design_experiment <- function(design_criterion,
+design_experiment <- function(criterion,
                               lower_bound,
                               upper_bound,
                               stochastic     = TRUE, 
@@ -67,7 +67,7 @@ design_experiment <- function(design_criterion,
                                                     wait.generations = 10),
                               diagnostics    = 1,
                               max_augment    = 10,
-                              verbose        = 1, 
+                              verbose        = TRUE, 
                               cluster        = NULL) {
   
   #--- input checks ---# 
@@ -132,7 +132,7 @@ design_experiment <- function(design_criterion,
     if (lhs_budget > 0) {
       message("Evaluating Initial LHS Design")
       x_lhs       <- space_fill(lower_bound,upper_bound,lhs_budget)
-      y_lhs       <- space_eval(x_lhs,design_criterion,cluster)
+      y_lhs       <- space_eval(x_lhs,criterion,cluster)
       lhs_budget  <- 0
     }
     
@@ -149,7 +149,7 @@ design_experiment <- function(design_criterion,
                                           upper_bound,
                                           init_budget)
         validation_response <- space_eval(validation_design,
-                                          design_criterion,
+                                          criterion,
                                           cluster)
       }
       
@@ -228,7 +228,7 @@ design_experiment <- function(design_criterion,
                                          upper   = upper_bound,
                                          control = EQI_controls)
       counter      <- counter + 1
-      new_y        <- design_criterion(as.vector(res$par))
+      new_y        <- criterion(as.vector(res$par))
       
       
       if (verbose > 0) {

@@ -7,27 +7,28 @@
 gp_residuals(design, response, model, plot = TRUE, type = "SK")
 }
 \arguments{
-\item{design}{Validation design matrix \code{n} x \code{d}.}
+\item{design}{A matrix of \code{n} rows and \code{d} columns.}
 
-\item{response}{Validation response vector \code{n} x \code{1}.}
+\item{response}{A column vector of length \code{n}.}
 
 \item{model}{A GP model of class \code{km} (see \code{\link[DiceKriging]{km-class}}).}
 
-\item{plot}{Logical, plot residuals and QQ-plots (outliners are highlighted).}
+\item{plot}{Plot residuals and QQ-plots (with outliers are highlighted)?}
 
 \item{type}{Kriging type: Simple Kriging "SK" or Universal Kriging "UK".}
 }
 \value{
-List including the Mahalanobis distance (MD), MD F-statistic, MD p-value, pivoted-Cholesky residuals, and standardized residuals.
+A list including the Mahalanobis distance (MD), MD F-statistic, MD p-value, pivoted-Cholesky residuals, and standardized residuals.
 }
 \description{
-This function computes standardized residuals and pivoted-Cholesky residuals of a Gaussian process (GP) model on a validation data set.  
+This function computes standardized and pivoted-Cholesky residuals of a Gaussian process (GP) model on a validation data set.  
 Mahalanobis distance and Mahalanobis p-value are calculated as well. 
-These statistics provide evidence for ill-fitting GP model and possible reasons for the lack-of-fit. 
+These statistics provide evidence of lack-of-fit in the GP model and possible reasons. 
 The residuals can be plotted against predicted values as well as QQ-plots to check the normality assumption.
 }
 \examples{
 #--- Simple iid Normal Example ---#
+#model assumputions hold
 set.seed(123)
 # training data
 x           <- matrix(runif(20,-1.5,1.5),ncol=1) 
@@ -44,6 +45,7 @@ v_y         <- matrix(rnorm(25),ncol = 1)
 diagnostics <-gp_residuals(design = v_x, response = v_y,my_model)
 
 #--- Bastos and O'Hagan (2009) Two-input Toy Model ---#
+# needs more than 20 training points 
 set.seed(123)
 # training data
 x   <- lhs::randomLHS(20,2)

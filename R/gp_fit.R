@@ -3,9 +3,9 @@
 #' This function fits a Gaussian process (GP) model to set of possible designs and their corresponding design criterion evaluations. 
 #' This GP will then be used to optimize the design criterion using an expected improvement criterion. 
 #'
-#' @param design   A matrix of designs \code{n} x \code{d}. 
-#' @param response A vector of responses \code{n} x \code{1}. 
-#' @param options  A list specifing the type of GP model to fit (see \code{\link[DiceKriging]{km}}). 
+#' @param design   A matrix of \code{n} rows and \code{d} columns. 
+#' @param response A column vector of length \code{n}.
+#' @param options  A list specifying the type of GP model to fit (see \code{\link[DiceKriging]{km}}). 
 #' 
 #' @export
 #' @return  A list of properties from class \code{km} (see \code{\link[DiceKriging]{km-class}}).  

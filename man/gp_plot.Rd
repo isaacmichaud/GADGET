@@ -11,10 +11,10 @@ gp_plot(model, inputs, plot_data = FALSE)
 
 \item{inputs}{An vector of values at which to evaluate the GP model.}
 
-\item{plot_data}{Logical. Plot data used to fit the GP as well.}
+\item{plot_data}{Plot data used to fit the GP as well?}
 }
 \value{
-List of GP predictions used to generate the figure.
+A list of GP predictions and uncertainties used to generate the figure.
 }
 \description{
 Plots univariate Gaussian process (GP) models with 95\% credible bands.

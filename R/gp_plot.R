@@ -4,9 +4,9 @@
 #'
 #' @param model     A GP model of class \code{km} (see \code{\link[DiceKriging]{km-class}}).
 #' @param inputs    An vector of values at which to evaluate the GP model.
-#' @param plot_data Logical. Plot data used to fit the GP as well.
+#' @param plot_data Plot data used to fit the GP as well?
 #' 
-#' @return List of GP predictions used to generate the figure. 
+#' @return A list of GP predictions and uncertainties used to generate the figure. 
 #' 
 #' @export
 #' @examples 

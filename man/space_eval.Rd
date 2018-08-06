@@ -4,23 +4,23 @@
 \alias{space_eval}
 \title{Evaluate Design Criterion on LHS}
 \usage{
-space_eval(lhs, design_criterion, cluster = NULL)
+space_eval(lhs, criterion, cluster = NULL)
 }
 \arguments{
-\item{lhs}{Matrix (n x d) of n proposed designs.}
+\item{lhs}{A matrix with \code{n} rows and \code{d} columns.}
 
-\item{design_criterion}{Function R^d -> R^q.}
+\item{criterion}{A function with vector input of length \code{d}.}
 
 \item{cluster}{A \code{parallel} cluster object.}
 }
 \value{
-Vector (q x n).
+A row vector of length \code{n}.
 }
 \description{
-This function simplifies the evaluatation of design criteria on space-filling designs (matrices were each row is a possible design). The design criterion is parallelized as well using the \code{parallel} package. A progress bar gives a visual indicator when the design criterion is expensive.
+This function simplifies the evaluation of design criteria on space-filling designs (matrices where each row is a possible design). The design criterion is parallelized as well using the \code{parallel} package. A progress bar gives a visual indicator when the design criterion is expensive.
 }
 \details{
-Only univariate design criteria (i.e. q = 1) can be optimized \code{GADGET} currently.
+Only univariate design criteria can be optimized \code{GADGET} currently.
 }
 \examples{
 my_lhs   <- space_fill(c(0,0),c(10,10),20)

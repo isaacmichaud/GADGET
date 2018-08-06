@@ -7,18 +7,18 @@
 gp_validate(design, response, model, type = "SK", verbose = FALSE)
 }
 \arguments{
-\item{design}{Validation design matrix \code{n} x \code{d}.}
+\item{design}{A matrix of \code{n} rows and \code{d} columns.}
 
-\item{response}{Validation response vector \code{n} x \code{1}.}
+\item{response}{A column vector of length \code{n}.}
 
 \item{model}{A GP model of class \code{km} (see \code{\link[DiceKriging]{km-class}}).}
 
 \item{type}{Kriging type: Simple Kriging "SK" or Universal Kriging "UK".}
 
-\item{verbose}{Logical, print the conclusion of the validation.}
+\item{verbose}{Print the conclusion of the validation?}
 }
 \value{
-Logical. If \code{TRUE} the GP is a valid emulator, otherwise the GP is an invalid emulator.
+A logical. If \code{TRUE} the GP is a valid emulator, otherwise the GP is an invalid emulator.
 }
 \description{
 Automatically validates a Gaussian process (GP) using a separate validation dataset not used in the fitting of the GP. 
@@ -28,8 +28,9 @@ Currently, it uses the Mahalanobis distance (MD) p-value to determine the GP fit
 }
 \examples{
 #--- Simple iid Normal Example ---#
-# training data
+# model assumputions hold
 set.seed(123)
+# training data
 x   <- matrix(runif(20,0,1),ncol=1) 
 y   <- matrix(rnorm(20),ncol = 1)
 # validation data
@@ -44,6 +45,7 @@ my_model    <- DiceKriging::km(formula=~1,
 gp_validate(v_x,v_y,my_model,verbose = TRUE)
 
 #--- Bastos and O'Hagan (2009) Two-input Toy Model ---#
+# needs more than 20 training points 
 set.seed(123)
 # training data
 x        <- lhs::randomLHS(20,2)
@@ -60,5 +62,5 @@ my_model    <- DiceKriging::km(formula=~1,
 gp_validate(v_x,v_y,my_model,verbose = TRUE)
 }
 \references{
-Bastos, L. S., & O’Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438. https://doi.org/10.1198/TECH.2009.08019
+Bastos, L. S., & O'Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438, <doi:10.1198/TECH.2009.08019>.
 }

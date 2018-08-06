@@ -8,11 +8,11 @@ gp_fit(design, response, options = list(formula = ~1, kernel =
   "matern5_2", optimizer = "gen", nuggetUse = TRUE))
 }
 \arguments{
-\item{design}{A matrix of designs \code{n} x \code{d}.}
+\item{design}{A matrix of \code{n} rows and \code{d} columns.}
 
-\item{response}{A vector of responses \code{n} x \code{1}.}
+\item{response}{A column vector of length \code{n}.}
 
-\item{options}{A list specifing the type of GP model to fit (see \code{\link[DiceKriging]{km}}).}
+\item{options}{A list specifying the type of GP model to fit (see \code{\link[DiceKriging]{km}}).}
 }
 \value{
 A list of properties from class \code{km} (see \code{\link[DiceKriging]{km-class}}).

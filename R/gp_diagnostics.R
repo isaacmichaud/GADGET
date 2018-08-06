@@ -1,24 +1,25 @@
 #' Gaussian Process Residuals
 #'
-#'This function computes standardized residuals and pivoted-Cholesky residuals of a Gaussian process (GP) model on a validation data set.  
+#'This function computes standardized and pivoted-Cholesky residuals of a Gaussian process (GP) model on a validation data set.  
 #'Mahalanobis distance and Mahalanobis p-value are calculated as well. 
-#'These statistics provide evidence for ill-fitting GP model and possible reasons for the lack-of-fit. 
+#'These statistics provide evidence of lack-of-fit in the GP model and possible reasons. 
 #'The residuals can be plotted against predicted values as well as QQ-plots to check the normality assumption. 
 #' 
 #this will form the basis of the diagnostics for GADGET GP fitting -> need to put more details about interpretation
 #'
-#' @param design   Validation design matrix \code{n} x \code{d}.
-#' @param response Validation response vector \code{n} x \code{1}. 
+#' @param design  A matrix of \code{n} rows and \code{d} columns.
+#' @param response A column vector of length \code{n}.
 #' @param model A GP model of class \code{km} (see \code{\link[DiceKriging]{km-class}}).
-#' @param plot Logical, plot residuals and QQ-plots (outliners are highlighted). 
+#' @param plot Plot residuals and QQ-plots (with outliers are highlighted)?
 #' @param type Kriging type: Simple Kriging "SK" or Universal Kriging "UK". 
 #' @references 
 #' Bastos, L. S., & O’Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438, <doi:10.1198/TECH.2009.08019>.
-#' @return List including the Mahalanobis distance (MD), MD F-statistic, MD p-value, pivoted-Cholesky residuals, and standardized residuals.
+#' @return A list including the Mahalanobis distance (MD), MD F-statistic, MD p-value, pivoted-Cholesky residuals, and standardized residuals.
 #' @export
 #'
 #' @examples
 #' #--- Simple iid Normal Example ---#
+#' #model assumputions hold
 #' set.seed(123)
 #' # training data
 #' x           <- matrix(runif(20,-1.5,1.5),ncol=1) 
@@ -35,6 +36,7 @@
 #' diagnostics <-gp_residuals(design = v_x, response = v_y,my_model)
 #'
 #'#--- Bastos and O'Hagan (2009) Two-input Toy Model ---#
+#' # needs more than 20 training points 
 #' set.seed(123)
 #' # training data
 #' x   <- lhs::randomLHS(20,2)
@@ -140,22 +142,23 @@ gp_residuals <- function(design, response, model, plot = TRUE, type = "SK") {
 #' It then determines roughly whether the model fits well enough. 
 #' Currently, it uses the Mahalanobis distance (MD) p-value to determine the GP fit. 
 #'
-#' @param design   Validation design matrix \code{n} x \code{d}.
-#' @param response Validation response vector \code{n} x \code{1}. 
+#' @param design  A matrix of \code{n} rows and \code{d} columns.
+#' @param response A column vector of length \code{n}.
 #' @param model A GP model of class \code{km} (see \code{\link[DiceKriging]{km-class}}).
 #' @param type Kriging type: Simple Kriging "SK" or Universal Kriging "UK". 
-#' @param verbose Logical, print the conclusion of the validation.
+#' @param verbose Print the conclusion of the validation?
 #'
 #' @references 
-#' Bastos, L. S., & O’Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438. https://doi.org/10.1198/TECH.2009.08019
+#' Bastos, L. S., & O'Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438, <doi:10.1198/TECH.2009.08019>.
 #'
-#' @return Logical. If \code{TRUE} the GP is a valid emulator, otherwise the GP is an invalid emulator.
+#' @return A logical. If \code{TRUE} the GP is a valid emulator, otherwise the GP is an invalid emulator.
 #' @export
 #'
 #' @examples 
 #' #--- Simple iid Normal Example ---#
-#' # training data
+#' # model assumputions hold
 #' set.seed(123)
+#' # training data
 #' x   <- matrix(runif(20,0,1),ncol=1) 
 #' y   <- matrix(rnorm(20),ncol = 1)
 #' # validation data
@@ -170,6 +173,7 @@ gp_residuals <- function(design, response, model, plot = TRUE, type = "SK") {
 #' gp_validate(v_x,v_y,my_model,verbose = TRUE)
 #' 
 #'#--- Bastos and O'Hagan (2009) Two-input Toy Model ---#
+#' # needs more than 20 training points 
 #' set.seed(123)
 #' # training data
 #' x        <- lhs::randomLHS(20,2)

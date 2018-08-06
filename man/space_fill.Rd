@@ -14,10 +14,10 @@ space_fill(lower_bound, upper_bound, budget)
 \item{budget}{An integer.}
 }
 \value{
-A matrix of size \code{budget} x \code{d}.
+A matrix with \code{budget} rows and \code{d} columns.
 }
 \description{
-Generates a maximin latin hypercude sample (LHS) covering the space defined by \code{lower_bound} and \code{upper_bound} with \code{budget} number of points. The resulting LHS is shifted and scaled to the domain defined by  \code{lower_bound} and \code{upper_bound}.
+Generates a maximin latin hypercube sample (LHS) covering the space defined by \code{lower_bound} and \code{upper_bound} with \code{budget} number of points. The resulting LHS is shifted and scaled to the domain defined by  \code{lower_bound} and \code{upper_bound}.
 }
 \examples{
 my_lhs <- space_fill(c(0,0),c(10,10),20)

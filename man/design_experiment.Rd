@@ -4,35 +4,35 @@
 \alias{design_experiment}
 \title{Design Optimal Experiment using Gaussian Process Optimization}
 \usage{
-design_experiment(design_criterion, lower_bound, upper_bound,
-  stochastic = TRUE, init_budget = 10, optim_budget = 10,
-  gp_options = list(formula = ~1, kernel = "matern5_2", optimizer =
-  "gen"), genoud_options = list(pop.size = 1000, max.generations = 100,
+design_experiment(criterion, lower_bound, upper_bound, stochastic = TRUE,
+  init_budget = 10, optim_budget = 10, gp_options = list(formula =
+  ~1, kernel = "matern5_2", optimizer = "gen"),
+  genoud_options = list(pop.size = 1000, max.generations = 100,
   wait.generations = 10), diagnostics = 1, max_augment = 10,
-  verbose = 1, cluster = NULL)
+  verbose = TRUE, cluster = NULL)
 }
 \arguments{
-\item{design_criterion}{Function R^d -> R^1 (see details).}
+\item{criterion}{A function with vector input of length \code{d} (see details).}
 
 \item{lower_bound}{A vector of length \code{d}.}
 
 \item{upper_bound}{A vector of length \code{d}.}
 
-\item{stochastic}{Logical, FALSE the design criterion is deterministic (see details).}
+\item{stochastic}{Is the design criterion stochastic or deterministic (see details)?}
 
-\item{init_budget}{An integer defining the size of the training and validation datasets for the GP model.}
+\item{init_budget}{An integer defining the size of the initial training dataset and the size of the validation dataset for the GP model.}
 
-\item{optim_budget}{An integer defining the number of GP optimizations iterations.}
+\item{optim_budget}{An integer defining the number of GP optimization iterations.}
 
-\item{gp_options}{A list specifing the type of GP model to fit (see \code{\link[DiceKriging]{km}}).}
+\item{gp_options}{A list specifying the type of GP model to fit (see \code{\link[DiceKriging]{km}}).}
 
-\item{genoud_options}{A list specifing the control options to optimizer (see \code{\link[rgenoud]{genoud}}).}
+\item{genoud_options}{A list specifying the control options to optimizer (see \code{\link[rgenoud]{genoud}}).}
 
 \item{diagnostics}{Type of GP diagnostics to perform before optimization occurs. There are currently three options: 0 (none), 1 (automatic) a simple Mahalanobis distance significance test, 2 (user inspected) execution is paused for visual inspection of pivoted-Cholesky residuals and QQ-plots.}
 
-\item{max_augment}{An integer defining the maxmimum number of design augmentations before terminating GP fitting.}
+\item{max_augment}{An integer defining the maximum number of design augmentations before terminating GP fitting.}
 
-\item{verbose}{Logical, print extra output during execution.}
+\item{verbose}{Print extra output during execution?}
 
 \item{cluster}{A \code{\link[parallel]{parallel}} cluster object.}
 }
@@ -40,22 +40,22 @@ design_experiment(design_criterion, lower_bound, upper_bound,
 A list containing the optimal design, diagnostic results, and final GP model.
 }
 \description{
-This function implements the method by Weaver et al. (2016) that uses Gaussian process (GP) optimization to estimate an optimal design for a stochastic design criterion.  
+This function implements the method by Weaver, et al. (2016) that uses Gaussian process (GP) optimization to estimate an optimal design for a stochastic design criterion.  
 This function can also optimize a deterministic design criterion as well. Validation of the fitted GP models is provided by the statistics described in Bastos and O'Hagan (2009). 
 For sequential physical experiments or computer experiments with an expensive simulator, one can repeatedly use this function to compute the next step's optimal design point. 
 For sequential computer experiments with inexpensive simulators, see \code{\link[GADGET]{sequential_experiment}} which will automatically run the simulator and continue the sequential design automatically.
 }
 \details{
-The design criterion (DC) is a univariate function that measures the quality of a proposed design. 
-It can be either stochastic or deterministic.
+The design criterion (DC) is a stochastic or deterministic univariate function that measures the quality of a proposed design. 
 \code{GADGET} assumes the design criterion must be minimized. For example, instead of maximizing the determinant of the Fisher-information matrix, \code{GADGET} would minimize the negative determinant of the Fisher-information matrix.
 If the DC is stochastic then the GP model is fit with a nugget effect and expected quantile improvement (EQI) is used to perform the GP optimization. 
 The optimal design is taken to be the design that maximizes EQI on the final optimization iteration. 
 If the DC is deterministic then the GP model is fit without a nugget effect and expected improvement (EI) is used to perform the optimization.  
-The optimal design is taken to be the design with smallest observed DC over all evalaution of the DC.
+The optimal design is taken to be the design with smallest observed DC over all evaluation of the DC.
 }
 \examples{
 #--- Deterministic D-Optimal Design ---#
+# simple linear regression model
 # design = c(x1,x2,p) (two point design with weight) 
 \dontrun{
 dc <- function(design) {

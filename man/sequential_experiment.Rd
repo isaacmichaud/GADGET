@@ -4,49 +4,48 @@
 \alias{sequential_experiment}
 \title{Design and Run Sequential Computer Experiment}
 \usage{
-sequential_experiment(design_criterion, posterior_sampler, lower_bound,
-  upper_bound, stochastic, simulator, init_design = NULL,
-  init_response = NULL, design_budget = 10, batch = 1,
-  init_budget = 10, optim_budget = 10, gp_options = list(formula =
-  ~1, kernel = "matern5_2", optimizer = "gen"),
-  genoud_options = list(pop.size = 1000, max.generations = 100,
-  wait.generations = 10), diagnostics = 1, verbose = 1,
-  max_augment = 10, cluster = NULL)
+sequential_experiment(criterion, sampler, lower_bound, upper_bound,
+  stochastic, simulator, init_design = NULL, init_response = NULL,
+  design_budget = 10, batch = 1, init_budget = 10,
+  optim_budget = 10, gp_options = list(formula = ~1, kernel =
+  "matern5_2", optimizer = "gen"), genoud_options = list(pop.size = 1000,
+  max.generations = 100, wait.generations = 10), diagnostics = 1,
+  verbose = 1, max_augment = 10, cluster = NULL)
 }
 \arguments{
-\item{design_criterion}{Function R^d -> R^1 (see details).}
+\item{criterion}{A function with vector input of length \code{d} (see details).}
 
-\item{posterior_sampler}{Function that sample from the posterior distribution given current observations (see details).}
+\item{sampler}{A function that sample from the posterior distribution given current observations (see details).}
 
 \item{lower_bound}{A vector of length \code{d}.}
 
 \item{upper_bound}{A vector of length \code{d}.}
 
-\item{stochastic}{Logical, FALSE the design criterion is deterministic (see details).}
+\item{stochastic}{Is the design criterion stochastic or deterministic (see details)?}
 
 \item{simulator}{Computer simulator being explored.}
 
-\item{init_design}{List of design points that data have been collected.}
+\item{init_design}{A matrix of design points that data have been collected.}
 
-\item{init_response}{List of responses that have been collected.}
+\item{init_response}{A matrix of responses that have been collected.}
 
 \item{design_budget}{Number of sequential experiments to perform.}
 
 \item{batch}{Number of design points per experiment stage (batch = 1 is sequential) (see details)}
 
-\item{init_budget}{An integer defining the size of the training and validation datasets for the GP model.}
+\item{init_budget}{An integer defining the size of the initial training dataset and the size of the validation dataset for the GP model.}
 
 \item{optim_budget}{An integer defining the number of GP optimizations iterations.}
 
-\item{gp_options}{A list specifing the type of GP model to fit (see \code{\link[DiceKriging]{km}}).}
+\item{gp_options}{A list specifying the type of GP model to fit (see \code{\link[DiceKriging]{km}}).}
 
-\item{genoud_options}{A list specifing the control options to optimizer (see \code{\link[rgenoud]{genoud}}).}
+\item{genoud_options}{A list specifying the control options to optimizer (see \code{\link[rgenoud]{genoud}}).}
 
 \item{diagnostics}{Type of GP diagnostics to perform before optimization occurs. There are currently three options: 0 (none), 1 (automatic) a simple Mahalanobis distance significance test, 2 (user inspected) execution is paused for visual inspection of pivoted-Cholesky residuals and QQ-plots.}
 
-\item{verbose}{Logical, print extra output during execution.}
+\item{verbose}{Print extra output during execution?}
 
-\item{max_augment}{An integer defining the maxmimum number of design augmentations before terminating GP fitting.}
+\item{max_augment}{An integer defining the maximum number of design augmentations before terminating GP fitting.}
 
 \item{cluster}{A \code{\link[parallel]{parallel}} cluster object.}
 }
@@ -58,19 +57,18 @@ New posterior samples are drawn, and the process is repeated.
 Validation of the fitted GP models is provided by the statistics described in Bastos and O'Hagan (2009).
 }
 \details{
-The design criterion (DC) is a univariate function that measures the quality of a proposed design. 
-It can be either stochastic or deterministic.
-#' \code{GADGET} assumes the design criterion must be minimized. For example, instead of maximizing the determinant of the Fisher-information matrix, \code{GADGET} would minimize the negative determinant of the Fisher-information matrix. 
+The design criterion (DC) is a stochastic or deterministic univariate function that measures the quality of a proposed design. 
+\code{GADGET} assumes the design criterion must be minimized. For example, instead of maximizing the determinant of the Fisher-information matrix, \code{GADGET} would minimize the negative determinant of the Fisher-information matrix. 
 If the DC is stochastic then the GP model is fit with a nugget effect and expected quantile improvement (EQI) is used to perform the GP optimization. 
 The optimal design is taken to be the design that maximizes EQI on the final optimization iteration. 
 If the DC is deterministic then the GP model is fit without a nugget effect and expected improvement (EI) is used to perform the optimization.  
-The optimal design is taken to be the design with smallest observed DC over all evalaution of the DC. 
+The optimal design is taken to be the design with smallest observed DC over all evaluation of the DC. 
 
 The \code{batch} allows for more than one design point to be optimized in a single step of \code{GADGET}. 
 To use this feature, the design criterion must be able to accept multiple design points stack in a matrix with each row being a single design point.
 
-The \code{posterior_sampler} accepts the currently observed design and response (including the initial design and response) to produce posterior of simulator parameters.
-The design criterion also requires a second argument accepting the posterior sample so that the utility function is computed with the current posterior distribution.
+The function \code{sampler} must accept the currently observed design and response (including the initial design and response) to produce posteriors for the simulator's parameters.
+The design criterion also requires a second argument accepting the posterior sample so that the utility function is computed with respect to the current posterior distribution.
 }
 \examples{
 #--- Synthetic Design Problem ---#
@@ -81,9 +79,9 @@ dc <- function(x,theta) {sum(x^2) + rnorm(1,0.1)}
 post <- function(design,response) {rnorm(1000)}
 #demonstration simulatior 
 sim <- function(x) {x}
-my_result = sequential_experiment(design_criterion  = dc,
-                                 stochastic        = TRUE,
-                                 posterior_sampler = post,
+my_result = sequential_experiment(criterion    = dc,
+                                 stochastic    = TRUE,
+                                 sampler       = post,
                                  lower_bound   = -3,
                                  upper_bound   =  3,
                                  simulator     = sim,

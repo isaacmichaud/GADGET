@@ -7,13 +7,13 @@
 bo09_toy(x)
 }
 \arguments{
-\item{x}{A vector from [0,1] x [0,1]}
+\item{x}{A vector of length 2.}
 }
 \value{
-Scalar
+A scalar.
 }
 \description{
-A toy model for the demonstration of Gaussian process validation plots and statistics. It is a product of a rational function in x[1] and an exponential function in x[2]. The function is smoother in x[2] than x[1].
+A toy model for the demonstration of Gaussian process validation plots and statistics. It is a product of a rational function in x[1] and an exponential function in x[2]. The function is smoother in x[2] than x[1]. The function's domain is the unit square.
 }
 \examples{
 print(bo09_toy(c(0.5,0.25)))
@@ -26,5 +26,5 @@ graphics::contour(a,a,z, xlab = expression(x[1]), ylab = expression(x[2]))
 
 }
 \references{
-Bastos, L. S., & O’Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438. <doi:10.1198/TECH.2009.08019>
+Bastos, L. S., & O'Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438, <doi:10.1198/TECH.2009.08019>.
 }
