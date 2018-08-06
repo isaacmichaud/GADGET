@@ -127,7 +127,7 @@ sequential_experiment <- function(criterion,
   for (i in 1:design_budget) {
     
     if (verbose) {
-      print_seperator()
+      print_separate()
       cat(sprintf("Stage %d\n",i))
       #cat("Sampling Posterior\n")
     }
