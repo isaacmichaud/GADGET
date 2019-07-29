@@ -16,6 +16,8 @@
 #' @param diagnostics Type of GP diagnostics to perform before optimization occurs. There are currently three options: 0 (none), 1 (automatic) a simple Mahalanobis distance significance test, 2 (user inspected) execution is paused for visual inspection of pivoted-Cholesky residuals and QQ-plots.
 #' @param max_augment An integer defining the maximum number of design augmentations before terminating GP fitting.
 #' @param verbose     Print extra output during execution?
+#' @param infile      Saved evaluations of the DC from previous GADGET run
+#' @param outfile     File to save all DC evaluations to while running
 #' @param cluster A \code{\link[parallel]{parallel}} cluster object.
 #' 
 #' @details
@@ -67,6 +69,8 @@ design_experiment <- function(criterion,
                                                     wait.generations = 10),
                               diagnostics    = 1,
                               max_augment    = 10,
+                              infile         = NULL,
+                              outfile        = NULL,
                               verbose        = TRUE, 
                               cluster        = NULL) {
   
@@ -127,13 +131,35 @@ design_experiment <- function(criterion,
     EQI_controls$hard.generation.limit <- FALSE
   }
   
+  if (!is.null(infile)) {
+    message("Loading Initial Design")
+    load(infile) #this needs to be more robust
+    init_x_lhs = gadget_lhs_design$x_lhs
+    init_y_lhs = gadget_lhs_design$y_lhs
+  }
+  
   while (optim_budget > 0) {
     
     if (lhs_budget > 0) {
-      message("Evaluating Initial LHS Design")
+      if (exists("init_x_lhs")) {
+        message("Extending Initial LHS Design")
+      } else {
+        message("Evaluating Initial LHS Design") 
+      }
+      
       x_lhs       <- space_fill(lower_bound,upper_bound,lhs_budget)
-      y_lhs       <- space_eval(x_lhs,criterion,cluster)
       lhs_budget  <- 0
+      y_lhs       <- space_eval(x_lhs,criterion,cluster)
+      
+      if (exists("init_x_lhs")) {
+        x_lhs = rbind(init_x_lhs,x_lhs)
+        y_lhs = c(init_y_lhs,y_lhs)
+      } 
+      
+      if (!is.null(outfile)) {
+        gadget_lhs_design = list(x_lhs = x_lhs,y_lhs = y_lhs) 
+        save(gadget_lhs_design,file = outfile)
+      }
     }
     
     gp_model <- gp_fit(design   = x_lhs, 
@@ -194,6 +220,12 @@ design_experiment <- function(criterion,
         message("Gaussian Process Failed to validate; augmenting design")
         x_lhs <- rbind(x_lhs, validation_design)
         y_lhs <- c(y_lhs, validation_response)
+        
+        if (!is.null(outfile)) {
+          gadget_lhs_design = list(x_lhs = x_lhs,y_lhs = y_lhs) 
+          save(gadget_lhs_design,file = outfile)
+        }
+        
         validation_response <- NULL
         validation_design   <- NULL
         optimize            <- FALSE
@@ -252,6 +284,12 @@ design_experiment <- function(criterion,
       #collecting the information from eqi
       x_lhs   <- rbind(x_lhs,res$par)
       y_lhs   <- c(y_lhs,new_y)
+      
+      if (!is.null(outfile)) {
+        gadget_lhs_design = list(x_lhs = x_lhs,y_lhs = y_lhs) 
+        save(gadget_lhs_design,file = outfile)
+      }
+      
       eqi     <- rbind(eqi,unlist(res$value[1]))
       nugget  <- rbind(nugget,model@covariance@nugget)
       var     <- rbind(var,model@covariance@sd2)
