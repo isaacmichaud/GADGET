@@ -1,16 +1,16 @@
 Package: GADGET
 Title: Gaussian Process Approximations for Designing Experiments
 Version: 0.2.0
-Authors@R: c(person("Isaac", "Michaud", email = "ijmichau@ncsu.edu",role = c("aut", "cre")),
+Authors@R: c(person("Isaac", "Michaud", email = "imichaud@lanl.gov",role = c("aut", "cre")),
              person("Brian", "Weaver", role = c("aut")),
              person("Brian", "Williams", role = c("aut")))
 Description: Computes near-optimal Bayesian experimental designs with Gaussian processes optimization following the algorithm presented by  B. Weaver, et al. (2016) <doi:10.1214/15-BA945> for either physical or sequential computer experiments.
-License: GPL-3 
+License: BSD_3_clause + file LICENSE
 LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 6.1.0
 Imports:
-    DiceKriging, 
+    DiceKriging,
     DiceOptim,
     lhs,
     pbapply,
@@ -22,5 +22,5 @@ Suggests:
     rmarkdown,
     testthat
 NeedsCompilation: no
-Maintainer: Isaac Michaud <ijmichau@ncsu.edu>
+Maintainer: Isaac Michaud <imichaud@lanl.gov>
 BugReports: https://github.com/isaacmichaud/GADGET/issues
