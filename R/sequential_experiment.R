@@ -145,7 +145,7 @@ sequential_experiment <- function(criterion,
       #cat("Optimizing Design\n")
     }
     #browser()
-    next_batch <- design_experiment(criterion = dc,
+    next_batch <- design_experiment(criterion        = dc,
                                     stochastic       = stochastic, 
                                     lower_bound      = rep(lower_bound,batch),
                                     upper_bound      = rep(upper_bound,batch),
@@ -163,8 +163,7 @@ sequential_experiment <- function(criterion,
     }
     
     #collect new data
-    print(next_batch$experiment)
-    new_data <- pbapply::pbapply(matrix(next_batch$experiment, nrow = batch, byrow = TRUE), 1, simulator,cl = cluster)
+    #print(next_batch$experiment)
     
     if (verbose) {
       cat("Next Observation(s):\n")
@@ -172,6 +171,14 @@ sequential_experiment <- function(criterion,
       cat("\n")
       cat("Running Simulator\n")
     }
+    
+    new_data <- pbapply::pbapply(matrix(as.matrix(next_batch$experiment), nrow = batch, byrow = TRUE), 1, simulator,cl = cluster)
+    
+    if (verbose) {
+      cat("\n")
+      cat("New Simulation Result(s):\n")
+      print(t(new_data))
+    }    
     
     design   <- rbind(design,next_batch$experiment)
     response <- rbind(response,t(new_data))
