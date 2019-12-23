@@ -4,8 +4,12 @@
 \alias{gp_fit}
 \title{Fit a Gaussian Process Model}
 \usage{
-gp_fit(design, response, options = list(formula = ~1, kernel =
-  "matern5_2", optimizer = "gen", nuggetUse = TRUE))
+gp_fit(
+  design,
+  response,
+  options = list(formula = ~1, kernel = "matern5_2", optimizer = "gen", nuggetUse =
+    TRUE)
+)
 }
 \arguments{
 \item{design}{A matrix of \code{n} rows and \code{d} columns.}

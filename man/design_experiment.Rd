@@ -4,12 +4,22 @@
 \alias{design_experiment}
 \title{Design Optimal Experiment using Gaussian Process Optimization}
 \usage{
-design_experiment(criterion, lower_bound, upper_bound, stochastic = TRUE,
-  init_budget = 10, optim_budget = 10, gp_options = list(formula =
-  ~1, kernel = "matern5_2", optimizer = "gen"),
-  genoud_options = list(pop.size = 1000, max.generations = 100,
-  wait.generations = 10), diagnostics = 1, max_augment = 10,
-  verbose = TRUE, cluster = NULL)
+design_experiment(
+  criterion,
+  lower_bound,
+  upper_bound,
+  stochastic = TRUE,
+  init_budget = 10,
+  optim_budget = 10,
+  gp_options = list(formula = ~1, kernel = "matern5_2", optimizer = "gen"),
+  genoud_options = list(pop.size = 1000, max.generations = 100, wait.generations = 10),
+  diagnostics = 1,
+  max_augment = 10,
+  infile = NULL,
+  outfile = NULL,
+  verbose = TRUE,
+  cluster = NULL
+)
 }
 \arguments{
 \item{criterion}{A function with vector input of length \code{d} (see details).}
@@ -31,6 +41,10 @@ design_experiment(criterion, lower_bound, upper_bound, stochastic = TRUE,
 \item{diagnostics}{Type of GP diagnostics to perform before optimization occurs. There are currently three options: 0 (none), 1 (automatic) a simple Mahalanobis distance significance test, 2 (user inspected) execution is paused for visual inspection of pivoted-Cholesky residuals and QQ-plots.}
 
 \item{max_augment}{An integer defining the maximum number of design augmentations before terminating GP fitting.}
+
+\item{infile}{Saved evaluations of the DC from previous GADGET run}
+
+\item{outfile}{File to save all DC evaluations to while running}
 
 \item{verbose}{Print extra output during execution?}
 

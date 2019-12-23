@@ -21,9 +21,9 @@ gp_residuals(design, response, model, plot = TRUE, type = "SK")
 A list including the Mahalanobis distance (MD), MD F-statistic, MD p-value, pivoted-Cholesky residuals, and standardized residuals.
 }
 \description{
-This function computes standardized and pivoted-Cholesky residuals of a Gaussian process (GP) model on a validation data set.  
-Mahalanobis distance and Mahalanobis p-value are calculated as well. 
-These statistics provide evidence of lack-of-fit in the GP model and possible reasons. 
+This function computes standardized and pivoted-Cholesky residuals of a Gaussian process (GP) model on a validation data set.
+Mahalanobis distance and Mahalanobis p-value are calculated as well.
+These statistics provide evidence of lack-of-fit in the GP model and possible reasons.
 The residuals can be plotted against predicted values as well as QQ-plots to check the normality assumption.
 }
 \examples{
@@ -31,7 +31,7 @@ The residuals can be plotted against predicted values as well as QQ-plots to che
 #model assumputions hold
 set.seed(123)
 # training data
-x           <- matrix(runif(20,-1.5,1.5),ncol=1) 
+x           <- matrix(runif(20,-1.5,1.5),ncol=1)
 y           <- matrix(rnorm(20),ncol = 1)
 my_model    <- DiceKriging::km(formula=~1,
                                design=x,
@@ -45,7 +45,7 @@ v_y         <- matrix(rnorm(25),ncol = 1)
 diagnostics <-gp_residuals(design = v_x, response = v_y,my_model)
 
 #--- Bastos and O'Hagan (2009) Two-input Toy Model ---#
-# needs more than 20 training points 
+# needs more than 20 training points
 set.seed(123)
 # training data
 x   <- lhs::randomLHS(20,2)
@@ -62,5 +62,5 @@ my_model    <- DiceKriging::km(formula=~1,
 diagnostics <- gp_residuals(v_x,v_y,my_model)
 }
 \references{
-Bastos, L. S., & O’Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438, <doi:10.1198/TECH.2009.08019>.
+Bastos, L. S., & O'Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438, <doi:10.1198/TECH.2009.08019>.
 }

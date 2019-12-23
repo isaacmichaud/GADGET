@@ -21,9 +21,9 @@ gp_validate(design, response, model, type = "SK", verbose = FALSE)
 A logical. If \code{TRUE} the GP is a valid emulator, otherwise the GP is an invalid emulator.
 }
 \description{
-Automatically validates a Gaussian process (GP) using a separate validation dataset not used in the fitting of the GP. 
-The Bastos and O'Hagan (2009) empirical fit statistics are used to determine if the GP accurately predicts the validation data. 
-It then determines roughly whether the model fits well enough. 
+Automatically validates a Gaussian process (GP) using a separate validation dataset not used in the fitting of the GP.
+The Bastos and O'Hagan (2009) empirical fit statistics are used to determine if the GP accurately predicts the validation data.
+It then determines roughly whether the model fits well enough.
 Currently, it uses the Mahalanobis distance (MD) p-value to determine the GP fit.
 }
 \examples{
@@ -31,7 +31,7 @@ Currently, it uses the Mahalanobis distance (MD) p-value to determine the GP fit
 # model assumputions hold
 set.seed(123)
 # training data
-x   <- matrix(runif(20,0,1),ncol=1) 
+x   <- matrix(runif(20,0,1),ncol=1)
 y   <- matrix(rnorm(20),ncol = 1)
 # validation data
 v_x <- matrix(runif(20,-1,1),ncol=1)
@@ -45,7 +45,7 @@ my_model    <- DiceKriging::km(formula=~1,
 gp_validate(v_x,v_y,my_model,verbose = TRUE)
 
 #--- Bastos and O'Hagan (2009) Two-input Toy Model ---#
-# needs more than 20 training points 
+# needs more than 20 training points
 set.seed(123)
 # training data
 x        <- lhs::randomLHS(20,2)

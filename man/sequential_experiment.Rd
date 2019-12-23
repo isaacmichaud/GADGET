@@ -4,13 +4,26 @@
 \alias{sequential_experiment}
 \title{Design and Run Sequential Computer Experiment}
 \usage{
-sequential_experiment(criterion, sampler, lower_bound, upper_bound,
-  stochastic, simulator, init_design = NULL, init_response = NULL,
-  design_budget = 10, batch = 1, init_budget = 10,
-  optim_budget = 10, gp_options = list(formula = ~1, kernel =
-  "matern5_2", optimizer = "gen"), genoud_options = list(pop.size = 1000,
-  max.generations = 100, wait.generations = 10), diagnostics = 1,
-  verbose = 1, max_augment = 10, cluster = NULL)
+sequential_experiment(
+  criterion,
+  sampler,
+  lower_bound,
+  upper_bound,
+  stochastic,
+  simulator,
+  init_design = NULL,
+  init_response = NULL,
+  design_budget = 10,
+  batch = 1,
+  init_budget = 10,
+  optim_budget = 10,
+  gp_options = list(formula = ~1, kernel = "matern5_2", optimizer = "gen"),
+  genoud_options = list(pop.size = 1000, max.generations = 100, wait.generations = 10),
+  diagnostics = 1,
+  verbose = 1,
+  max_augment = 10,
+  cluster = NULL
+)
 }
 \arguments{
 \item{criterion}{A function with vector input of length \code{d} (see details).}
