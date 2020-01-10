@@ -1,6 +1,6 @@
 #' Fit a Gaussian Process Model
 #'
-#' This function fits a Gaussian process (GP) model to set of possible designs and their corresponding design criterion evaluations. 
+#' This function fits a Gaussian process (GP) model to a set of possible designs and their corresponding design criterion evaluations. 
 #' This GP will then be used to optimize the design criterion using an expected improvement criterion. 
 #'
 #' @param design   A matrix of \code{n} rows and \code{d} columns. 

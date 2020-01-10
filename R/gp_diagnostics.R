@@ -1,8 +1,8 @@
 #' Gaussian Process Residuals
 #'
 #'This function computes standardized and pivoted-Cholesky residuals of a Gaussian process (GP) model on a validation data set.
-#'Mahalanobis distance and Mahalanobis p-value are calculated as well.
-#'These statistics provide evidence of lack-of-fit in the GP model and possible reasons.
+#'Mahalanobis distance and Mahalanobis p-value are calculated.
+#'These statistics provide evidence of lack-of-fit in the GP model.
 #'The residuals can be plotted against predicted values as well as QQ-plots to check the normality assumption.
 #'
 #this will form the basis of the diagnostics for GADGET GP fitting -> need to put more details about interpretation
@@ -151,7 +151,7 @@ gp_residuals <- function(design, response, model, plot = TRUE, type = "SK") {
 #' @references
 #' Bastos, L. S., & O'Hagan, A. (2009). Diagnostics for gaussian process emulators. Technometrics, 51(4), 425–438, <doi:10.1198/TECH.2009.08019>.
 #'
-#' @return A logical. If \code{TRUE} the GP is a valid emulator, otherwise the GP is an invalid emulator.
+#' @return A logical. If \code{TRUE} the GP is considered a valid emulator, otherwise further training data will need to be collected to improve the emulator fit.
 #' @export
 #'
 #' @examples

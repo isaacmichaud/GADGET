@@ -18,7 +18,7 @@ gp_validate(design, response, model, type = "SK", verbose = FALSE)
 \item{verbose}{Print the conclusion of the validation?}
 }
 \value{
-A logical. If \code{TRUE} the GP is a valid emulator, otherwise the GP is an invalid emulator.
+A logical. If \code{TRUE} the GP is considered a valid emulator, otherwise further training data will need to be collected to improve the emulator fit.
 }
 \description{
 Automatically validates a Gaussian process (GP) using a separate validation dataset not used in the fitting of the GP.

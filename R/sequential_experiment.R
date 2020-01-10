@@ -33,6 +33,8 @@
 #' If the DC is deterministic then the GP model is fit without a nugget effect and expected improvement (EI) is used to perform the optimization.  
 #' The optimal design is taken to be the design with smallest observed DC over all evaluation of the DC. 
 #' 
+#' The GADGET represents designs as a d-length vector. The user supplied DC function must translate this vector into the apporiate form for computing the DC. The \code{upper_bound} and \code{lower_bound} arguments define bounds of each element in the vectorized design.  
+#' 
 #' The \code{batch} allows for more than one design point to be optimized in a single step of \code{GADGET}. 
 #' To use this feature, the design criterion must be able to accept multiple design points stack in a matrix with each row being a single design point.
 #' 

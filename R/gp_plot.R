@@ -1,6 +1,6 @@
 #' Plot 1D Gaussian Process Model
 #'
-#' Plots univariate Gaussian process (GP) models with 95\% credible bands. 
+#' Plots univariate Gaussian process (GP) models with 95\% credible bands. For extremely simply visualizations.
 #'
 #' @param model     A GP model of class \code{km} (see \code{\link[DiceKriging]{km-class}}).
 #' @param inputs    An vector of values at which to evaluate the GP model.

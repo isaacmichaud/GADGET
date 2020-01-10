@@ -26,9 +26,8 @@ Imports:
     graphics,
     stats
 Suggests:
-    parallel,
-    rmarkdown,
-    testthat
+    testthat,
+    parallel
 NeedsCompilation: no
-Maintainer: Isaac Michaud <imichaud@lanl.gov>
+Maintainer: Isaac J. Michaud <imichaud@lanl.gov>
 BugReports: https://github.com/isaacmichaud/GADGET/issues

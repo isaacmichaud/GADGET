@@ -22,8 +22,8 @@ A list including the Mahalanobis distance (MD), MD F-statistic, MD p-value, pivo
 }
 \description{
 This function computes standardized and pivoted-Cholesky residuals of a Gaussian process (GP) model on a validation data set.
-Mahalanobis distance and Mahalanobis p-value are calculated as well.
-These statistics provide evidence of lack-of-fit in the GP model and possible reasons.
+Mahalanobis distance and Mahalanobis p-value are calculated.
+These statistics provide evidence of lack-of-fit in the GP model.
 The residuals can be plotted against predicted values as well as QQ-plots to check the normality assumption.
 }
 \examples{

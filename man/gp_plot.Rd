@@ -17,7 +17,7 @@ gp_plot(model, inputs, plot_data = FALSE)
 A list of GP predictions and uncertainties used to generate the figure.
 }
 \description{
-Plots univariate Gaussian process (GP) models with 95\% credible bands.
+Plots univariate Gaussian process (GP) models with 95\% credible bands. For extremely simply visualizations.
 }
 \examples{
 x  <- matrix(seq(-1,1,0.3),ncol=1)

@@ -22,7 +22,7 @@ gp_fit(
 A list of properties from class \code{km} (see \code{\link[DiceKriging]{km-class}}).
 }
 \description{
-This function fits a Gaussian process (GP) model to set of possible designs and their corresponding design criterion evaluations. 
+This function fits a Gaussian process (GP) model to a set of possible designs and their corresponding design criterion evaluations. 
 This GP will then be used to optimize the design criterion using an expected improvement criterion.
 }
 \examples{

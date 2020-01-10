@@ -66,6 +66,8 @@ If the DC is stochastic then the GP model is fit with a nugget effect and expect
 The optimal design is taken to be the design that maximizes EQI on the final optimization iteration. 
 If the DC is deterministic then the GP model is fit without a nugget effect and expected improvement (EI) is used to perform the optimization.  
 The optimal design is taken to be the design with smallest observed DC over all evaluation of the DC.
+
+The GADGET represents designs as a d-length vector. The user supplied DC function must translate this vector into the apporiate form for computing the DC. The \code{upper_bound} and \code{lower_bound} arguments define bounds of each element in the vectorized design.
 }
 \examples{
 #--- Deterministic D-Optimal Design ---#
