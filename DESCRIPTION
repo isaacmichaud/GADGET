@@ -29,5 +29,5 @@ Suggests:
     testthat,
     parallel
 NeedsCompilation: no
-Maintainer: Isaac J. Michaud <imichaud@lanl.gov>
+Maintainer: Isaac Michaud <imichaud@lanl.gov>
 BugReports: https://github.com/isaacmichaud/GADGET/issues
