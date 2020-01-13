@@ -17,6 +17,10 @@ This is a new release, so there are no reverse dependencies.
 
 This is a resubmission. In this version I have: 
 
+* LICENSE file was corrected to conform with CRAN BSD-3 template
+
+* moved additional copyright notice from LICENSE file to COPYRIGHTS file  
+
 * removed middle initial from maintainer's name to conform with author's name
 
 ---
