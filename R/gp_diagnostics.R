@@ -73,8 +73,10 @@ gp_residuals <- function(design, response, model, plot = TRUE, type = "SK") {
   pivots    <- attr(pc,"pivot")
 
   if (plot == TRUE) {
-    graphics::par(mfrow=c(2,2))
-
+    
+    oldpar <-graphics::par(mfrow=c(2,2))
+    on.exit(graphics::par(oldpar))
+    
     #plot standardized residuals
     ind    <- (abs(std_preds) > 2)
     yrange <- 1.2*diff(range(std_preds))
@@ -125,7 +127,7 @@ gp_residuals <- function(design, response, model, plot = TRUE, type = "SK") {
     #plot QQ-normal standardized residuals
     stats::qqnorm(D_pc, main = "QQ-plot PC Residuals")
     graphics::abline(0,1,lty=2,col='red')
-    graphics::par(mfrow=c(1,1))
+    
   }
 
   return(list(MD = D_MD,

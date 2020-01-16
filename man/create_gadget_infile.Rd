@@ -4,7 +4,7 @@
 \alias{create_gadget_infile}
 \title{Create GADGET input files}
 \usage{
-create_gadget_infile(lhs_design, response, filename = "gadget_infile.Rdata")
+create_gadget_infile(lhs_design, response, filename)
 }
 \arguments{
 \item{lhs_design}{design matrix of DC evaluations}
@@ -17,11 +17,12 @@ create_gadget_infile(lhs_design, response, filename = "gadget_infile.Rdata")
 This utility function will save batch evaluated design criterion (DC) responses to seed the design_experiment function.
 }
 \examples{
-\dontrun{
 #produces an Rdata file containing previous runs of the design criterion
 set.seed(123)
 lhs_design         <- lhs::maximinLHS(10,1)
 criterion_response <- (lhs_design - 1)^2
-create_gadget_infile(lhs_design,criterion_response, filename = "gadget_demo_infile.Rdata")
-}
+file               <- paste(tempdir(),"/gadget_infile.Rdata", sep="")
+create_gadget_infile(lhs_design,criterion_response, filename = file)
+message(sprintf("gadget_infile.Rdata saved to directory \%s",tempdir()))
+
 }

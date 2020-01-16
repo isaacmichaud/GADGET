@@ -73,7 +73,7 @@ The GADGET represents designs as a d-length vector. The user supplied DC functio
 #--- Deterministic D-Optimal Design ---#
 # simple linear regression model
 # design = c(x1,x2,p) (two point design with weight) 
-\dontrun{
+\donttest{
 dc <- function(design) {
 fisher_mat <- (1-design[3])*c(1,design[2]) \%*\% t(c(1,design[2]))
 fisher_mat <- fisher_mat + design[3]*c(1,design[1]) \%*\% t(c(1,design[1]))

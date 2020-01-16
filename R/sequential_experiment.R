@@ -44,7 +44,7 @@
 #' @export
 #' @examples
 #' #--- Synthetic Design Problem ---#
-#' \dontrun{ 
+#' \donttest{ 
 #' #demonstration design criterion
 #' dc <- function(x,theta) {sum(x^2) + rnorm(1,0.1)}
 #' #demonstration posterior sampler 

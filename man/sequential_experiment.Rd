@@ -87,7 +87,7 @@ The design criterion also requires a second argument accepting the posterior sam
 }
 \examples{
 #--- Synthetic Design Problem ---#
-\dontrun{ 
+\donttest{ 
 #demonstration design criterion
 dc <- function(x,theta) {sum(x^2) + rnorm(1,0.1)}
 #demonstration posterior sampler 
